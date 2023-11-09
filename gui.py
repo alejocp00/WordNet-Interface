@@ -157,7 +157,7 @@ class GUI:
                 self.check_buttons_frame,
                 text=c_enum,
                 variable=self.check_buttons_state[c_enum],
-                command=lambda c=c_enum: self.only_one_active(c),
+                command=lambda c=c_enum: self.check_box_behavior(c),
             )
 
     def poblate_check_buttons_state(self):
@@ -165,12 +165,72 @@ class GUI:
         for i in range(12):
             self.check_buttons_state[CheckButtonState(i + 1)] = tk.IntVar()
 
+    def check_box_behavior(self, selected):
+        """This will be the behavior of the check buttons."""
+
+        # Deactivate the other check buttons
+        self.only_one_active(selected)
+
+        # Set state to IDLE if no check button is selected
+        for value in self.check_buttons_state.values():
+            if value.get() == 0:
+                self.state = CheckButtonState.IDLE
+            else:
+                # Update the state of the program
+                self.state = selected
+                break
+
+        # Update the text of the entries
+        self.select_text()
+
     def only_one_active(self, selected):
         """This function will make sure that only one check button is active at the same time."""
 
         for key in self.check_buttons_state.keys():
             if key is not selected:
                 self.check_buttons_state[key].set(0)
+
+    def select_text(self):
+        """This function will select the text of the two entries info text."""
+        if self.state == CheckButtonState.IDLE:
+            self.entry_info_1.config(text="Word 1")
+            self.entry_info_2.config(text="Word 2")
+        elif self.state == CheckButtonState.ASSERTION:
+            self.entry_info_1.config(text="All kind of words.")
+            self.entry_info_2.config(text="Not be used")
+        elif self.state == CheckButtonState.HYPERONYM:
+            self.entry_info_1.config(text="Noun or verb")
+            self.entry_info_2.config(text="Noun or verb")
+        elif self.state == CheckButtonState.ENTAILMENT:
+            self.entry_info_1.config(text="Verb")
+            self.entry_info_2.config(text="Verb")
+        elif self.state == CheckButtonState.SIMILARITY:
+            self.entry_info_1.config(text="All kind of words.")
+            self.entry_info_2.config(text="All kind of words.")
+        elif self.state == CheckButtonState.MERONYM_HOLONYM:
+            self.entry_info_1.config(text="Noun")
+            self.entry_info_2.config(text="Noun")
+        elif self.state == CheckButtonState.SEMANTIC_RELATION:
+            self.entry_info_1.config(text="Verb")
+            self.entry_info_2.config(text="Verb")
+        elif self.state == CheckButtonState.VERBS_LEXICAL_RELATION:
+            self.entry_info_1.config(text="Verb")
+            self.entry_info_2.config(text="Verb")
+        elif self.state == CheckButtonState.ATRIBUTTE:
+            self.entry_info_1.config(text="Noun")
+            self.entry_info_2.config(text="Adjective")
+        elif self.state == CheckButtonState.ANTONYM:
+            self.entry_info_1.config(text="All kind of words.")
+            self.entry_info_2.config(text="All kind of words.")
+        elif self.state == CheckButtonState.SA:
+            self.entry_info_1.config(text="Verb")
+            self.entry_info_2.config(text="Verb or adjective")
+        elif self.state == CheckButtonState.PARTICIPE:
+            self.entry_info_1.config(text="Adjective")
+            self.entry_info_2.config(text="Verb")
+        elif self.state == CheckButtonState.PERTENECE:
+            self.entry_info_1.config(text="Adjective or adverb")
+            self.entry_info_2.config(text="Adjective if 1st is adverb. Otherwise both.")
 
 
 class CheckButtonState(Enum):
