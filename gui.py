@@ -293,6 +293,3 @@ class CheckButtonState(Enum):
             return "Pertenece"
         else:
             return "Unknown"
-
-
-GUI().run()
