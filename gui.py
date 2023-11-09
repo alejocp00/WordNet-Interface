@@ -151,83 +151,26 @@ class GUI:
 
     def create_check_buttons(self):
         """Create the twelve check buttons (Assertion, Hyperonym,Entailment,Similarity,Meronym/Holonym,Semantic Relation,Verbs Lexical Relation, Atributte, Antonym, SA, Participe, Pertenece)"""
-
-        self.check_buttons_dic[self.state.ASSERTION] = tk.Checkbutton(
-            self.check_buttons_frame,
-            text="Assertion",
-            variable=self.check_buttons_state[CheckButtonState.ASSERTION],
-        )
-
-        self.check_buttons_dic[self.state.HYPERONYM] = tk.Checkbutton(
-            self.check_buttons_frame,
-            text="Hyperonym",
-            variable=self.check_buttons_state[CheckButtonState.HYPERONYM],
-        )
-
-        self.check_buttons_dic[self.state.ENTAILMENT] = tk.Checkbutton(
-            self.check_buttons_frame,
-            text="Entailment",
-            variable=self.check_buttons_state[CheckButtonState.ENTAILMENT],
-        )
-
-        self.check_buttons_dic[self.state.SIMILARITY] = tk.Checkbutton(
-            self.check_buttons_frame,
-            text="Similarity",
-            variable=self.check_buttons_state[CheckButtonState.SIMILARITY],
-        )
-
-        self.check_buttons_dic[self.state.MERONYM_HOLONYM] = tk.Checkbutton(
-            self.check_buttons_frame,
-            text="Meronym/Holonym",
-            variable=self.check_buttons_state[CheckButtonState.MERONYM_HOLONYM],
-        )
-
-        self.check_buttons_dic[self.state.SEMANTIC_RELATION] = tk.Checkbutton(
-            self.check_buttons_frame,
-            text="Semantic Relation",
-            variable=self.check_buttons_state[CheckButtonState.SEMANTIC_RELATION],
-        )
-
-        self.check_buttons_dic[self.state.VERBS_LEXICAL_RELATION] = tk.Checkbutton(
-            self.check_buttons_frame,
-            text="Verbs Lexical Relation",
-            variable=self.check_buttons_state[CheckButtonState.VERBS_LEXICAL_RELATION],
-        )
-
-        self.check_buttons_dic[self.state.ATRIBUTTE] = tk.Checkbutton(
-            self.check_buttons_frame,
-            text="Atributte",
-            variable=self.check_buttons_state[CheckButtonState.ATRIBUTTE],
-        )
-
-        self.check_buttons_dic[self.state.ANTONYM] = tk.Checkbutton(
-            self.check_buttons_frame,
-            text="Antonym",
-            variable=self.check_buttons_state[CheckButtonState.ANTONYM],
-        )
-
-        self.check_buttons_dic[self.state.SA] = tk.Checkbutton(
-            self.check_buttons_frame,
-            text="SA",
-            variable=self.check_buttons_state[CheckButtonState.SA],
-        )
-
-        self.check_buttons_dic[self.state.PARTICIPE] = tk.Checkbutton(
-            self.check_buttons_frame,
-            text="Participe",
-            variable=self.check_buttons_state[CheckButtonState.PARTICIPE],
-        )
-
-        self.check_buttons_dic[self.state.PERTENECE] = tk.Checkbutton(
-            self.check_buttons_frame,
-            text="Pertenece",
-            variable=self.check_buttons_state[CheckButtonState.PERTENECE],
-        )
+        for i in range(12):
+            c_enum = CheckButtonState(i + 1)
+            self.check_buttons_dic[c_enum] = tk.Checkbutton(
+                self.check_buttons_frame,
+                text=c_enum,
+                variable=self.check_buttons_state[c_enum],
+                command=lambda c=c_enum: self.only_one_active(c),
+            )
 
     def poblate_check_buttons_state(self):
         """This function will poblate the check buttons dictionary with the state of the program."""
         for i in range(12):
             self.check_buttons_state[CheckButtonState(i + 1)] = tk.IntVar()
+
+    def only_one_active(self, selected):
+        """This function will make sure that only one check button is active at the same time."""
+
+        for key in self.check_buttons_state.keys():
+            if key is not selected:
+                self.check_buttons_state[key].set(0)
 
 
 class CheckButtonState(Enum):
@@ -246,6 +189,34 @@ class CheckButtonState(Enum):
     SA = 10
     PARTICIPE = 11
     PERTENECE = 12
+
+    def __str__(self):
+        if self == CheckButtonState.ASSERTION:
+            return "Assertion"
+        elif self == CheckButtonState.HYPERONYM:
+            return "Hyperonym"
+        elif self == CheckButtonState.ENTAILMENT:
+            return "Entailment"
+        elif self == CheckButtonState.SIMILARITY:
+            return "Similarity"
+        elif self == CheckButtonState.MERONYM_HOLONYM:
+            return "Meronym/Holonym"
+        elif self == CheckButtonState.SEMANTIC_RELATION:
+            return "Semantic Relation"
+        elif self == CheckButtonState.VERBS_LEXICAL_RELATION:
+            return "Verbs Lexical Relation"
+        elif self == CheckButtonState.ATRIBUTTE:
+            return "Atributte"
+        elif self == CheckButtonState.ANTONYM:
+            return "Antonym"
+        elif self == CheckButtonState.SA:
+            return "SA"
+        elif self == CheckButtonState.PARTICIPE:
+            return "Participe"
+        elif self == CheckButtonState.PERTENECE:
+            return "Pertenece"
+        else:
+            return "Unknown"
 
 
 GUI().run()
