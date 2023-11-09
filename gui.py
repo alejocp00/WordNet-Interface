@@ -9,7 +9,7 @@ class GUI:
 
         # Create the buttons dictionaries
         self.check_buttons_dic = {}
-        self.check_buttons_estate = self.poblate_check_buttons_estate()
+        self.check_buttons_state = {}
 
         # Instance the size of the window
         self.width = 600
@@ -40,6 +40,7 @@ class GUI:
         # Create the check buttons frame
         self.check_buttons_frame = tk.Frame(self.root)
 
+        self.poblate_check_buttons_state()
         self.create_check_buttons()
 
         # Create the two buttons (Search, Clear)
@@ -154,81 +155,79 @@ class GUI:
         self.check_buttons_dic[self.state.ASSERTION] = tk.Checkbutton(
             self.check_buttons_frame,
             text="Assertion",
-            variable=self.check_buttons_estate[self.state.ASSERTION],
+            variable=self.check_buttons_state[CheckButtonState.ASSERTION],
         )
 
         self.check_buttons_dic[self.state.HYPERONYM] = tk.Checkbutton(
             self.check_buttons_frame,
             text="Hyperonym",
-            variable=self.check_buttons_estate[self.state.HYPERONYM],
+            variable=self.check_buttons_state[CheckButtonState.HYPERONYM],
         )
 
         self.check_buttons_dic[self.state.ENTAILMENT] = tk.Checkbutton(
             self.check_buttons_frame,
             text="Entailment",
-            variable=self.check_buttons_estate[self.state.ENTAILMENT],
+            variable=self.check_buttons_state[CheckButtonState.ENTAILMENT],
         )
 
         self.check_buttons_dic[self.state.SIMILARITY] = tk.Checkbutton(
             self.check_buttons_frame,
             text="Similarity",
-            variable=self.check_buttons_estate[self.state.SIMILARITY],
+            variable=self.check_buttons_state[CheckButtonState.SIMILARITY],
         )
 
         self.check_buttons_dic[self.state.MERONYM_HOLONYM] = tk.Checkbutton(
             self.check_buttons_frame,
             text="Meronym/Holonym",
-            variable=self.check_buttons_estate[self.state.MERONYM_HOLONYM],
+            variable=self.check_buttons_state[CheckButtonState.MERONYM_HOLONYM],
         )
 
         self.check_buttons_dic[self.state.SEMANTIC_RELATION] = tk.Checkbutton(
             self.check_buttons_frame,
             text="Semantic Relation",
-            variable=self.check_buttons_estate[self.state.SEMANTIC_RELATION],
+            variable=self.check_buttons_state[CheckButtonState.SEMANTIC_RELATION],
         )
 
         self.check_buttons_dic[self.state.VERBS_LEXICAL_RELATION] = tk.Checkbutton(
             self.check_buttons_frame,
             text="Verbs Lexical Relation",
-            variable=self.check_buttons_estate[self.state.VERBS_LEXICAL_RELATION],
+            variable=self.check_buttons_state[CheckButtonState.VERBS_LEXICAL_RELATION],
         )
 
         self.check_buttons_dic[self.state.ATRIBUTTE] = tk.Checkbutton(
             self.check_buttons_frame,
             text="Atributte",
-            variable=self.check_buttons_estate[self.state.ATRIBUTTE],
+            variable=self.check_buttons_state[CheckButtonState.ATRIBUTTE],
         )
 
         self.check_buttons_dic[self.state.ANTONYM] = tk.Checkbutton(
             self.check_buttons_frame,
             text="Antonym",
-            variable=self.check_buttons_estate[self.state.ANTONYM],
+            variable=self.check_buttons_state[CheckButtonState.ANTONYM],
         )
 
         self.check_buttons_dic[self.state.SA] = tk.Checkbutton(
             self.check_buttons_frame,
             text="SA",
-            variable=self.check_buttons_estate[self.state.SA],
+            variable=self.check_buttons_state[CheckButtonState.SA],
         )
 
         self.check_buttons_dic[self.state.PARTICIPE] = tk.Checkbutton(
             self.check_buttons_frame,
             text="Participe",
-            variable=self.check_buttons_estate[self.state.PARTICIPE],
+            variable=self.check_buttons_state[CheckButtonState.PARTICIPE],
         )
 
         self.check_buttons_dic[self.state.PERTENECE] = tk.Checkbutton(
             self.check_buttons_frame,
             text="Pertenece",
-            variable=self.check_buttons_estate[self.state.PERTENECE],
+            variable=self.check_buttons_state[CheckButtonState.PERTENECE],
         )
 
-    def poblate_check_buttons_estate():
-        """This function will return a dictionary with the values of the check buttons."""
-        dic = {}
+    def poblate_check_buttons_state(self):
+        """This function will poblate the check buttons dictionary with the state of the program."""
         for i in range(12):
-            dic[CheckButtonState(i + 1)] = tk.IntVar()
-        return dic
+            self.check_buttons_state[CheckButtonState(i + 1)] = tk.IntVar()
 
 
 class CheckButtonState(Enum):
