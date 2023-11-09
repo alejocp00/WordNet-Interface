@@ -116,7 +116,7 @@ class GUI:
 
         # Placing the entries.
         self.entry_1.place(
-            x=0,
+            x=5,
             y=0,
             width=self.entry_width - self.min_separation,
             height=self.entry_high,
@@ -131,7 +131,7 @@ class GUI:
         )
 
         self.entry_2.place(
-            x=0,
+            x=5,
             y=80 + self.min_separation,
             width=self.entry_width - self.min_separation,
             height=self.entry_high,
@@ -142,6 +142,45 @@ class GUI:
             y=80 + self.min_separation + self.entry_high,
             width=self.entry_width - self.min_separation,
             height=self.entry_high,
+        )
+
+        # Placing the buttons.
+        self.button_search.place(
+            x=5,
+            y=self.height / 2 - self.entry_high,
+            width=self.width / 4 - self.min_separation,
+            height=self.entry_high,
+        )
+
+        self.button_clear.place(
+            x=5 + self.width / 4,
+            y=self.height / 2 - self.entry_high,
+            width=self.width / 4 - self.min_separation,
+            height=self.entry_high,
+        )
+
+        # Placing the check buttons frame.
+        self.check_buttons_frame.place(
+            x=0,
+            y=self.height / 2,
+            width=self.width / 2,
+            height=self.height / 2,
+        )
+
+        # Placing the check buttons.
+        for i in range(12):
+            self.buttons_dic[CheckButtonState(i + 1)].grid(
+                row=i // 2,
+                column=i % 2,
+                sticky="w",
+            )
+
+        # Placing the result text.
+        self.result_text.place(
+            x=self.width / 2,
+            y=0,
+            width=self.width / 2,
+            height=self.height,
         )
 
 
