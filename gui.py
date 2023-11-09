@@ -49,6 +49,7 @@ class GUI:
 
         # Create the result text
         self.result_text = tk.Text(self.root)
+        self.result_text.config(state=tk.DISABLED)
 
         # Update the state of the program
         self.place()
@@ -231,6 +232,21 @@ class GUI:
         elif self.state == CheckButtonState.PERTENECE:
             self.entry_info_1.config(text="Adjective or adverb")
             self.entry_info_2.config(text="Adjective if 1st is adverb. Otherwise both.")
+
+    def show_result(self, result: str):
+        """This method will update the Text widget with the given result"""
+
+        # Enable the text widget
+        self.result_text.config(state=tk.NORMAL)
+
+        # Delete the current text
+        self.result_text.delete("1.0", tk.END)
+
+        # Insert the new text
+        self.result_text.insert(tk.END, result)
+
+        # Disable the text widget
+        self.result_text.config(state=tk.DISABLED)
 
 
 class CheckButtonState(Enum):
