@@ -30,29 +30,18 @@ class Consulter:
 
         self.result_string = "Processing..."
 
+        # Check for the Assertion operator.
         if self.operator == CheckButtonState.ASSERTION:
             self.result_string = self.assertion()
 
     def assertion(self):
         """Search all possible meanings of the word 1"""
 
-        # Get all the word info through the s predicate.
-        s_result = self.make_consult(
-            f"s(SynsetID, WordNumber,'{self.word_1.word}', WordType, WordSense, TagCount)"
-        )
+        # Get the principal data of the word 1
+        self.fill_word_info(1)
 
-        if s_result == []:
-            return self.not_fount(self.word_1.word)
-
-        # Fill the word info with the results.
-        for result in s_result:
-            self.word_1.synset_id_list.append(result["SynsetID"])
-            self.word_1.word_number_list.append(result["WordNumber"])
-            self.word_1.word_sense_list.append(result["WordSense"])
-            self.word_1.word_type_list.append(
-                self.translate_word_type(result["WordType"])
-            )
-            self.word_1.tag_count_list.append(result["TagCount"])
+        if not self.word_1.exist:
+            return self.not_found(self.word_1.word)
 
         # Get all the word info through the g predicate.
         for synset_id in self.word_1.synset_id_list:
@@ -65,6 +54,27 @@ class Consulter:
             result_string += f"{self.word_1.word}:\n  ({self.word_1.word_type_list[i]}):\n    {self.word_1.gloss_list[i]}\n"
 
         return result_string
+
+    def fill_word_info(self, word_selector: int):
+        temp_word = self.word_1 if word_selector == 1 else self.word_2
+
+        # Get all the word info through the s predicate.
+        s_result = self.make_consult(
+            f"s(SynsetID, WordNumber,'{temp_word.word}', WordType, WordSense, TagCount)"
+        )
+
+        # Check if the word exists.
+        temp_word.exist = s_result != []
+
+        # Fill the word info with the results.
+        for result in s_result:
+            temp_word.synset_id_list.append(result["SynsetID"])
+            temp_word.word_number_list.append(result["WordNumber"])
+            temp_word.word_sense_list.append(result["WordSense"])
+            temp_word.word_type_list.append(
+                self.translate_word_type(result["WordType"])
+            )
+            temp_word.tag_count_list.append(result["TagCount"])
 
     def make_consult(self, query: str) -> list:
         """Make a consult to the prolog file."""
@@ -98,6 +108,7 @@ class WordInfo:
         self.word_sense_list = []
         self.gloss_list = []
         self.tag_count_list = []
+        self.exist = False
 
     def __str__(self):
         return self.word
