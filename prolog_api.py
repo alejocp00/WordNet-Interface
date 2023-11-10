@@ -34,6 +34,15 @@ class Consulter:
         if self.operator == CheckButtonState.ASSERTION:
             self.result_string = self.assertion()
 
+        # Check for the Similarity operator.
+        elif self.operator == CheckButtonState.SIMILARITY:
+            if self.word_2.word == "" and self.word_1.word != "":
+                self.result_string = self.similarity_1_to_all(1)
+            elif self.word_1.word == "" and self.word_2.word != "":
+                self.result_string = self.similarity_1_to_all(2)
+            else:
+                self.result_string = self.similarity_1_to_2()
+
     def assertion(self):
         """Search all possible meanings of the word 1"""
 
@@ -52,6 +61,39 @@ class Consulter:
         result_string = ""
         for i in range(len(self.word_1.synset_id_list)):
             result_string += f"{self.word_1.word}:\n  ({self.word_1.word_type_list[i]}):\n    {self.word_1.gloss_list[i]}\n"
+
+        return result_string
+
+    def similarity_1_to_all(self, word_indicator: int = 1):
+        """Search all possible meanings of the word 1 and 2"""
+
+        # Get the principal data of the word 1 and 2
+        self.fill_word_info(word_indicator)
+
+        temp_word = self.word_1 if word_indicator == 1 else self.word_2
+
+        if not temp_word.exist:
+            return self.not_found(temp_word.word)
+
+        # Get all the similar of the word
+        similar_synset_list = []
+        for synset_id in temp_word.synset_id_list:
+            similar_result = self.make_consult(f"sim({synset_id}, SimilarID)")
+            similar_synset_list.append(similar_result)
+
+        # Get all the words in the synset
+        similar_words_list = []
+        for similar_synset in similar_synset_list:
+            for similar_word in similar_synset:
+                similar_words_list.append(self.get_all_words(similar_word["SimilarID"]))
+
+        # Eliminate the repeated words
+        similar_words_list = list(set(similar_words_list))
+
+        # Create the result string.
+        result_string = ""
+        for i in range(len(similar_words_list)):
+            result_string += f"{similar_words_list[i]}\n"
 
         return result_string
 
@@ -75,6 +117,16 @@ class Consulter:
                 self.translate_word_type(result["WordType"])
             )
             temp_word.tag_count_list.append(result["TagCount"])
+
+    def get_all_words(self, S_ID: str):
+        """Get all the words in a synset"""
+
+        words_in_synset = []
+
+        search_result = self.make_consult(f"s({S_ID}, _, Word, _, _, _)")
+
+        for result in search_result:
+            words_in_synset.append(result["Word"])
 
     def make_consult(self, query: str) -> list:
         """Make a consult to the prolog file."""
