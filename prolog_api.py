@@ -43,6 +43,15 @@ class Consulter:
             else:
                 self.result_string = self.similarity_1_to_2()
 
+        # Check for the Antonym operator.
+        elif self.operator == CheckButtonState.ANTONYM:
+            if self.word_2.word == "" and self.word_1.word != "":
+                self.result_string = self.antonym_1_to_all(1)
+            elif self.word_1.word == "" and self.word_2.word != "":
+                self.result_string = self.antonym_1_to_all(2)
+            else:
+                self.result_string = self.antonym_1_to_2()
+
     def assertion(self):
         """Search all possible meanings of the word 1"""
 
@@ -103,6 +112,61 @@ class Consulter:
 
         if result_string == "":
             return "No similar words were found."
+
+        return result_string
+
+    # Todo: Implement this method.
+    def similarity_1_to_2(self):
+        pass
+
+    def antonym_1_to_all(self, word_indicator: int = 1):
+        """Search all possible meanings of the word 1 and 2"""
+
+        # Get the principal data of the word 1 and 2
+        self.fill_word_info(word_indicator)
+
+        temp_word = self.word_1 if word_indicator == 1 else self.word_2
+
+        if not temp_word.exist:
+            return self.not_found(temp_word.word)
+
+        # Get all the antonyms of the word
+        antonym_synset_list = []
+        for i in range(len(temp_word.synset_id_list)):
+            antonym_result = self.make_consult(
+                f"ant({temp_word.synset_id_list[i]},{temp_word.word_number_list[i]}, SynsetID, WordNumber)"
+            )
+            antonym_synset_list.append(antonym_result)
+
+        # Get the words indexing with the word number. This will consult s/6 with the synset id and the word number.
+        antonym_words_list = []
+        for antonym_synset in antonym_synset_list:
+            for antonym_word in antonym_synset:
+                antonym_words_list.append(
+                    self.make_consult(
+                        f"s({antonym_word['SynsetID']}, {antonym_word['WordNumber']}, Word, _, _, _)"
+                    )[0]["Word"]
+                )
+
+        # Get the gloss of the antonym synset.
+        gloss_list = []
+        for antonym_synset in antonym_synset_list:
+            for antonym_word in antonym_synset:
+                gloss_list.append(
+                    self.make_consult(f"g({antonym_word['SynsetID']}, Gloss)")[0][
+                        "Gloss"
+                    ]
+                )
+
+        # Create the result string.
+        result_string = f"Antonym words with {temp_word.word}:\n\n"
+        for i in range(len(antonym_words_list)):
+            result_string += f"{gloss_list[i]}:\n "
+            result_string += f"\t{antonym_words_list[i]}"
+            result_string += "\n\n"
+
+        if result_string == "":
+            return "No antonym words were found."
 
         return result_string
 
