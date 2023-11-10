@@ -52,6 +52,15 @@ class Consulter:
             else:
                 self.result_string = self.antonym_1_to_2()
 
+        # Check for the Hypernym operator.
+        elif self.operator == CheckButtonState.HYPERONYM:
+            if self.word_2.word == "" and self.word_1.word != "":
+                self.result_string = self.hypernym_of()
+            elif self.word_1.word == "" and self.word_2.word != "":
+                self.result_string = self.inverse_hypernym()
+            else:
+                self.result_string = self.is_hypernym()
+
     def assertion(self):
         """Search all possible meanings of the word 1"""
 
@@ -167,6 +176,52 @@ class Consulter:
 
         if result_string == "":
             return "No antonym words were found."
+
+        return result_string
+
+    # Todo: Implement this method.
+    def antonym_1_to_2(self):
+        pass
+
+    def hypernym_of(self):
+        """Search all possible meanings of the word 1"""
+
+        # Get the principal data of the word 1
+        self.fill_word_info(1)
+
+        if not self.word_1.exist:
+            return self.not_found(self.word_1.word)
+
+        # Get all the hypernym of the word
+        hypernym_synset_list = []
+        for synset_id in self.word_1.synset_id_list:
+            hypernym_result = self.make_consult(f"hyp({synset_id}, HypernymID)")
+            hypernym_synset_list.append(hypernym_result)
+
+        # Get all the words in the synset
+        hypernym_words_list = []
+        gloss_list = []
+        for hypernym_synset in hypernym_synset_list:
+            for hypernym_word in hypernym_synset:
+                hypernym_words_list.append(
+                    self.get_all_words(hypernym_word["HypernymID"])
+                )
+                gloss_list.append(
+                    self.make_consult(f"g({hypernym_word['HypernymID']}, Gloss)")[0][
+                        "Gloss"
+                    ]
+                )
+
+        # Create the result string.
+        result_string = f"Hypernym words of {self.word_1.word}:\n\n"
+        for i in range(len(hypernym_words_list)):
+            result_string += f"{gloss_list[i]}:\n "
+            for word in hypernym_words_list[i]:
+                result_string += f"\t{word}"
+            result_string += "\n\n"
+
+        if result_string == "":
+            return "No hypernym words were found."
 
         return result_string
 
