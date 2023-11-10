@@ -53,7 +53,7 @@ class Consulter:
                 self.result_string = self.antonym_1_to_2()
 
         # Check for the Hypernym operator.
-        elif self.operator == CheckButtonState.HYPERONYM:
+        elif self.operator == CheckButtonState.HYPERNYM:
             if self.word_2.word == "" and self.word_1.word != "":
                 self.result_string = self.hypernym_of()
             elif self.word_1.word == "" and self.word_2.word != "":
@@ -224,6 +224,14 @@ class Consulter:
             return "No hypernym words were found."
 
         return result_string
+
+    # Todo: Implement this method.
+    def inverse_hypernym(self):
+        pass
+
+    # Todo: Implement this method.
+    def is_hypernym(self):
+        pass
 
     def fill_word_info(self, word_selector: int):
         temp_word = self.word_1 if word_selector == 1 else self.word_2

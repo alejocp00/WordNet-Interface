@@ -151,7 +151,7 @@ class GUI:
         )
 
     def create_check_buttons(self):
-        """Create the twelve check buttons (Assertion, Hyperonym,Entailment,Similarity,Meronym/Holonym,Semantic Relation,Verbs Lexical Relation, Atributte, Antonym, SA, Participe, Pertenece)"""
+        """Create the twelve check buttons (Assertion, Hypernym,Entailment,Similarity,Meronym/Holonym,Semantic Relation,Verbs Lexical Relation, Attribute, Antonym, SA, Participe, Pertenece)"""
         for i in range(12):
             c_enum = CheckButtonState(i + 1)
             self.check_buttons_dic[c_enum] = tk.Checkbutton(
@@ -199,7 +199,7 @@ class GUI:
         elif self.state == CheckButtonState.ASSERTION:
             self.entry_info_1.config(text="All kind of words.")
             self.entry_info_2.config(text="Not be used")
-        elif self.state == CheckButtonState.HYPERONYM:
+        elif self.state == CheckButtonState.HYPERNYM:
             self.entry_info_1.config(text="Noun or verb")
             self.entry_info_2.config(text="Noun or verb")
         elif self.state == CheckButtonState.ENTAILMENT:
@@ -217,7 +217,7 @@ class GUI:
         elif self.state == CheckButtonState.VERBS_LEXICAL_RELATION:
             self.entry_info_1.config(text="Verb")
             self.entry_info_2.config(text="Verb")
-        elif self.state == CheckButtonState.ATRIBUTTE:
+        elif self.state == CheckButtonState.ATTRIBUTE:
             self.entry_info_1.config(text="Noun")
             self.entry_info_2.config(text="Adjective")
         elif self.state == CheckButtonState.ANTONYM:
@@ -254,13 +254,13 @@ class CheckButtonState(Enum):
 
     IDLE = 0
     ASSERTION = 1
-    HYPERONYM = 2
+    HYPERNYM = 2
     ENTAILMENT = 3
     SIMILARITY = 4
     MERONYM_HOLONYM = 5
     SEMANTIC_RELATION = 6
     VERBS_LEXICAL_RELATION = 7
-    ATRIBUTTE = 8
+    ATTRIBUTE = 8
     ANTONYM = 9
     SA = 10
     PARTICIPE = 11
@@ -269,8 +269,8 @@ class CheckButtonState(Enum):
     def __str__(self):
         if self == CheckButtonState.ASSERTION:
             return "Assertion"
-        elif self == CheckButtonState.HYPERONYM:
-            return "Hyperonym"
+        elif self == CheckButtonState.HYPERNYM:
+            return "Hypernym"
         elif self == CheckButtonState.ENTAILMENT:
             return "Entailment"
         elif self == CheckButtonState.SIMILARITY:
@@ -281,8 +281,8 @@ class CheckButtonState(Enum):
             return "Semantic Relation"
         elif self == CheckButtonState.VERBS_LEXICAL_RELATION:
             return "Verbs Lexical Relation"
-        elif self == CheckButtonState.ATRIBUTTE:
-            return "Atributte"
+        elif self == CheckButtonState.ATTRIBUTE:
+            return "Attribute"
         elif self == CheckButtonState.ANTONYM:
             return "Antonym"
         elif self == CheckButtonState.SA:
