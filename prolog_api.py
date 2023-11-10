@@ -83,17 +83,26 @@ class Consulter:
 
         # Get all the words in the synset
         similar_words_list = []
+        gloss_list = []
         for similar_synset in similar_synset_list:
             for similar_word in similar_synset:
                 similar_words_list.append(self.get_all_words(similar_word["SimilarID"]))
-
-        # Eliminate the repeated words
-        similar_words_list = list(set(similar_words_list))
+                gloss_list.append(
+                    self.make_consult(f"g({similar_word['SimilarID']}, Gloss)")[0][
+                        "Gloss"
+                    ]
+                )
 
         # Create the result string.
-        result_string = ""
+        result_string = f"Similar words with {temp_word.word}:\n\n"
         for i in range(len(similar_words_list)):
-            result_string += f"{similar_words_list[i]}\n"
+            result_string += f"{gloss_list[i]}:\n "
+            for word in similar_words_list[i]:
+                result_string += f"\t{word}"
+            result_string += "\n\n"
+
+        if result_string == "":
+            return "No similar words were found."
 
         return result_string
 
@@ -127,6 +136,8 @@ class Consulter:
 
         for result in search_result:
             words_in_synset.append(result["Word"])
+
+        return words_in_synset
 
     def make_consult(self, query: str) -> list:
         """Make a consult to the prolog file."""
