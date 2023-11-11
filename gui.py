@@ -211,7 +211,7 @@ class GUI:
         elif self.state == CheckButtonState.MERONYM_HOLONYM:
             self.entry_info_1.config(text="Noun")
             self.entry_info_2.config(text="Noun")
-        elif self.state == CheckButtonState.SEMANTIC_RELATION:
+        elif self.state == CheckButtonState.CAUSED:
             self.entry_info_1.config(text="Verb")
             self.entry_info_2.config(text="Verb")
         elif self.state == CheckButtonState.VERBS_LEXICAL_RELATION:
@@ -258,7 +258,7 @@ class CheckButtonState(Enum):
     ENTAILMENT = 3
     SIMILARITY = 4
     MERONYM_HOLONYM = 5
-    SEMANTIC_RELATION = 6
+    CAUSED = 6
     VERBS_LEXICAL_RELATION = 7
     ATTRIBUTE = 8
     ANTONYM = 9
@@ -277,8 +277,8 @@ class CheckButtonState(Enum):
             return "Similarity"
         elif self == CheckButtonState.MERONYM_HOLONYM:
             return "Meronym/Holonym"
-        elif self == CheckButtonState.SEMANTIC_RELATION:
-            return "Semantic Relation"
+        elif self == CheckButtonState.CAUSED:
+            return "Caused"
         elif self == CheckButtonState.VERBS_LEXICAL_RELATION:
             return "Verbs Lexical Relation"
         elif self == CheckButtonState.ATTRIBUTE:
