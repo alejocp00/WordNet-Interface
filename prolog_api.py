@@ -264,14 +264,52 @@ class Consulter:
                 result_string += f"\t{word}"
             result_string += "\n\n"
 
-        if result_string == "":
+        if result_string == f"Hypernym words of {self.word_1.word}:\n\n":
             return "No hypernym words were found."
 
         return result_string
 
-    # Todo: Implement this method.
     def inverse_hypernym(self):
-        pass
+        """Search for all the words that the word 2 is hypernym of"""
+
+        # Get the principal data of the word 2
+        self.fill_word_info(2)
+
+        if not self.word_2.exist:
+            return self.not_found(self.word_2.word)
+
+        # Get all the inverse hypernym of the word
+        inverse_hypernym_synset_list = []
+        for synset_id in self.word_2.synset_id_list:
+            inverse_hypernym_result = self.make_consult(f"hyp(SynsetID, {synset_id})")
+            inverse_hypernym_synset_list.append(inverse_hypernym_result)
+
+        # Get all the words in the synset
+        inverse_hypernym_words_list = []
+        gloss_list = []
+        for inverse_hypernym_synset in inverse_hypernym_synset_list:
+            for inverse_hypernym_word in inverse_hypernym_synset:
+                inverse_hypernym_words_list.append(
+                    self.get_all_words(inverse_hypernym_word["SynsetID"])
+                )
+                gloss_list.append(
+                    self.make_consult(f"g({inverse_hypernym_word['SynsetID']}, Gloss)")[
+                        0
+                    ]["Gloss"]
+                )
+
+        # Create the result string.
+        result_string = f"Inverse hypernym words of {self.word_2.word}:\n\n"
+        for i in range(len(inverse_hypernym_words_list)):
+            result_string += f"{gloss_list[i]}:\n "
+            for word in inverse_hypernym_words_list[i]:
+                result_string += f"\t{word}"
+            result_string += "\n\n"
+
+        if result_string == f"Inverse hypernym words of {self.word_2.word}:\n\n":
+            return "No inverse hypernym words were found."
+
+        return result_string
 
     # Todo: Implement this method.
     def is_hypernym(self):
