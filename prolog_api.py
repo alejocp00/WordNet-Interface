@@ -70,6 +70,18 @@ class Consulter:
             else:
                 self.result_string = self.is_entailment()
 
+        # Check for meronym holonym
+        elif self.operator == CheckButtonState.MERONYM_HOLONYM:
+            operations = ["mm", "ms", "mp"]
+            if self.word_2.word == "" and self.word_1.word != "":
+                for operation in operations:
+                    self.result_string += self.mer_hol("Meronym", operation)
+            elif self.word_1.word == "" and self.word_2.word != "":
+                for operation in operations:
+                    self.result_string += self.mer_hol("Holonym", operation)
+            else:
+                self.result_string = self.is_meronym()
+
     def assertion(self):
         """Search all possible meanings of the word 1"""
 
@@ -485,6 +497,77 @@ class Consulter:
                 return f"{self.word_2.word} is entailment of {self.word_1.word}.\n\n{gloss_list[i]}:\n\t{self.word_1.word}"
 
         return f"{self.word_2.word} is not entailment of {self.word_1.word}"
+
+    # endregion
+
+    # region Meronym Holonym
+
+    def mer_hol(self, function: str, operator: str):
+        """Make the consult to the prolog file with the operator. The operator can be mm, ms or mp."""
+
+        if function == "Meronym":
+            # Get the principal data of the word 1
+            self.fill_word_info(1)
+
+            if not self.word_1.exist:
+                return self.not_found(self.word_1.word)
+        elif function == "Holonym":
+            # Get the principal data of the word 2
+            self.fill_word_info(2)
+
+            if not self.word_2.exist:
+                return self.not_found(self.word_2.word)
+
+        operation = (
+            "member"
+            if operator == "mm"
+            else "substance"
+            if operator == "ms"
+            else "part"
+        )
+
+        consult = (
+            f"{operator}({synset_id}, Consult_ID)"
+            if function == "Meronym"
+            else f"{operator}(Consult_ID, {synset_id})"
+        )
+
+        # Get all the meronym of the word
+        consult_synset_list = []
+        for synset_id in self.word_1.synset_id_list:
+            consult_result = self.make_consult(f"{operator}({synset_id}, Consult_ID)")
+            consult_synset_list.append(consult_result)
+
+        # Get all the words in the synset
+        operation_words_list = []
+        gloss_list = []
+        for operation_synset in consult_synset_list:
+            for operation_word in operation_synset:
+                operation_words_list.append(
+                    self.get_all_words(operation_word["Consult_ID"])
+                )
+                gloss_list.append(
+                    self.make_consult(f"g({operation_word['Consult_ID']}, Gloss)")[0][
+                        "Gloss"
+                    ]
+                )
+
+        # Create the result string.
+        result_string = f"{function}-{operation} words of {self.word_1.word}:\n\n"
+        for i in range(len(operation_words_list)):
+            result_string += f"{gloss_list[i]}:\n "
+            for word in operation_words_list[i]:
+                result_string += f"\t{word}"
+            result_string += "\n\n"
+
+        if result_string == f"{function}-{operation} words of {self.word_1.word}:\n\n":
+            return f"No {function}-{operation} words were found."
+
+        return result_string
+
+    # Todo: Implement this method.
+    def is_meronym(self):
+        pass
 
     # endregion
 
