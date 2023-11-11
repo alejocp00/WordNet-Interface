@@ -82,6 +82,8 @@ class Consulter:
 
         return result_string
 
+    # region Similarity
+
     def similarity_1_to_all(self, word_indicator: int = 1):
         """Search all possible meanings of the word 1 and 2"""
 
@@ -127,6 +129,10 @@ class Consulter:
     # Todo: Implement this method.
     def similarity_1_to_2(self):
         pass
+
+    # endregion
+
+    # region Antonym
 
     def antonym_1_to_all(self, word_indicator: int = 1):
         """Search all possible meanings of the word 1 and 2"""
@@ -183,6 +189,10 @@ class Consulter:
     def antonym_1_to_2(self):
         pass
 
+    # endregion
+
+    # region Hypernym
+
     def hypernym_of(self):
         """Search all possible meanings of the word 1"""
 
@@ -232,6 +242,8 @@ class Consulter:
     # Todo: Implement this method.
     def is_hypernym(self):
         pass
+
+    # endregion
 
     def fill_word_info(self, word_selector: int):
         temp_word = self.word_1 if word_selector == 1 else self.word_2
