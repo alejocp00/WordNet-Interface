@@ -485,9 +485,43 @@ class Consulter:
 
         return result_string
 
-    # Todo: Implement this method.
     def antonym_1_to_2(self):
-        pass
+        """Check if word 2 is antonym of word 1"""
+
+        # Fill words info
+        self.fill_word_info(1)
+        self.fill_word_info(2)
+
+        # Check if the words exist
+        if not self.word_1.exist:
+            return self.not_found(self.word_1.word)
+        if not self.word_2.exist:
+            return self.not_found(self.word_2.word)
+
+        # Get all the antonyms of the word 1
+        antonym_synset_list = []
+        for synset_id in self.word_1.synset_id_list:
+            antonym_result = self.make_consult(f"ant({synset_id}, AntonymID)")
+            antonym_synset_list.append(antonym_result)
+
+        # Get all the words in the synset
+        antonym_words_list = []
+        gloss_list = []
+        for antonym_synset in antonym_synset_list:
+            for antonym_word in antonym_synset:
+                antonym_words_list.append(self.get_all_words(antonym_word["AntonymID"]))
+                gloss_list.append(
+                    self.make_consult(f"g({antonym_word['AntonymID']}, Gloss)")[0][
+                        "Gloss"
+                    ]
+                )
+
+        # Check if the word 2 is in the antonym words list
+        for i in range(len(antonym_words_list)):
+            if self.word_2.word in antonym_words_list[i]:
+                return f"{self.word_2.word} is antonym of {self.word_1.word}.\n\n{gloss_list[i]}:\n\t{self.word_1.word}"
+
+        return f"{self.word_2.word} is not antonym of {self.word_1.word}"
 
     # endregion
 
@@ -804,9 +838,42 @@ class Consulter:
 
         return result_string
 
-    # Todo: Implement this method.
     def is_meronym(self):
-        pass
+        """Check if the word 2 is meronym of the word 1"""
+
+        # Get the principal data of the word 1 and 2
+        self.fill_word_info(1)
+        self.fill_word_info(2)
+
+        if not self.word_1.exist:
+            return self.not_found(self.word_1.word)
+        if not self.word_2.exist:
+            return self.not_found(self.word_2.word)
+
+        # Get all the meronym of the word 1
+        meronym_synset_list = []
+        for synset_id in self.word_1.synset_id_list:
+            meronym_result = self.make_consult(f"mm({synset_id}, MeronymID)")
+            meronym_synset_list.append(meronym_result)
+
+        # Get all the words in the synset
+        meronym_words_list = []
+        gloss_list = []
+        for meronym_synset in meronym_synset_list:
+            for meronym_word in meronym_synset:
+                meronym_words_list.append(self.get_all_words(meronym_word["MeronymID"]))
+                gloss_list.append(
+                    self.make_consult(f"g({meronym_word['MeronymID']}, Gloss)")[0][
+                        "Gloss"
+                    ]
+                )
+
+        # Check if the word 2 is in the meronym words list
+        for i in range(len(meronym_words_list)):
+            if self.word_2.word in meronym_words_list[i]:
+                return f"{self.word_2.word} is meronym of {self.word_1.word}.\n\n{gloss_list[i]}:\n\t{self.word_1.word}"
+
+        return f"{self.word_2.word} is not meronym of {self.word_1.word}"
 
     # endregion
 
