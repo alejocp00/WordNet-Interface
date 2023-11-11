@@ -286,7 +286,7 @@ class CheckButtonState(Enum):
         elif self == CheckButtonState.ANTONYM:
             return "Antonym"
         elif self == CheckButtonState.SA:
-            return "SA"
+            return "Adicional information"
         elif self == CheckButtonState.PARTICIPE:
             return "Participe"
         elif self == CheckButtonState.PERTENECE:
