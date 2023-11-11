@@ -143,7 +143,7 @@ class GUI:
         )
 
         # Placing the check buttons.
-        for i in range(12):
+        for i in range(11):
             self.check_buttons_dic[CheckButtonState(i + 1)].grid(
                 row=i // 2,
                 column=i % 2,
@@ -160,7 +160,7 @@ class GUI:
 
     def create_check_buttons(self):
         """Create the twelve check buttons (Assertion, Hypernym,Entailment,Similarity,Meronym/Holonym,Semantic Relation,Verbs Lexical Relation, Attribute, Antonym, SA, Participe, Pertenece)"""
-        for i in range(12):
+        for i in range(11):
             c_enum = CheckButtonState(i + 1)
             self.check_buttons_dic[c_enum] = tk.Checkbutton(
                 self.check_buttons_frame,
@@ -171,7 +171,7 @@ class GUI:
 
     def poblate_check_buttons_state(self):
         """This function will poblate the check buttons dictionary with the state of the program."""
-        for i in range(12):
+        for i in range(11):
             self.check_buttons_state[CheckButtonState(i + 1)] = tk.IntVar()
 
     def check_box_behavior(self, selected):
@@ -220,9 +220,6 @@ class GUI:
             self.entry_info_1.config(text="Noun")
             self.entry_info_2.config(text="Noun")
         elif self.state == CheckButtonState.CAUSED:
-            self.entry_info_1.config(text="Verb")
-            self.entry_info_2.config(text="Verb")
-        elif self.state == CheckButtonState.VERBS_LEXICAL_RELATION:
             self.entry_info_1.config(text="Verb")
             self.entry_info_2.config(text="Verb")
         elif self.state == CheckButtonState.ATTRIBUTE:

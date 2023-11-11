@@ -13,12 +13,11 @@ class CheckButtonState(Enum):
     SIMILARITY = 4
     MERONYM_HOLONYM = 5
     CAUSED = 6
-    VERBS_LEXICAL_RELATION = 7
-    ATTRIBUTE = 8
-    ANTONYM = 9
-    SA = 10
-    PARTICIPLE = 11
-    PERTAINS = 12
+    ATTRIBUTE = 7
+    ANTONYM = 8
+    SA = 9
+    PARTICIPLE = 10
+    PERTAINS = 11
 
     def __str__(self):
         if self == CheckButtonState.ASSERTION:
@@ -33,8 +32,6 @@ class CheckButtonState(Enum):
             return "Meronym/Holonym"
         elif self == CheckButtonState.CAUSED:
             return "Caused"
-        elif self == CheckButtonState.VERBS_LEXICAL_RELATION:
-            return "Verbs Lexical Relation"
         elif self == CheckButtonState.ATTRIBUTE:
             return "Attribute"
         elif self == CheckButtonState.ANTONYM:
@@ -53,9 +50,10 @@ class Consulter:
     def __init__(self):
         # Create the prolog object.
         self.prolog = Prolog()
-
         # Consult the prolog files.
         self.load_consults()
+
+        self.result_string = ""
 
     def load_consults(self):
         """Load every prolog file in prolog_files."""
@@ -73,8 +71,6 @@ class Consulter:
 
     def process_query(self):
         """Perform the operation in the query"""
-
-        self.result_string = "Processing..."
 
         # Check for the Assertion operator.
         if self.operator == CheckButtonState.ASSERTION:
@@ -157,6 +153,9 @@ class Consulter:
         # Check for the Pertains operator.
         elif self.operator == CheckButtonState.PERTAINS:
             self.result_string = self.pertains()
+
+        else:
+            self.result_string = "Please select an operator."
 
     def assertion(self):
         """Search all possible meanings of the word 1"""
