@@ -1,5 +1,6 @@
 from enum import Enum
 import tkinter as tk
+from prolog_api import Consulter, CheckButtonState
 
 
 class GUI:
@@ -10,6 +11,9 @@ class GUI:
         # Create the buttons dictionaries
         self.check_buttons_dic = {}
         self.check_buttons_state = {}
+
+        # Create the consulter
+        self.consulter = Consulter()
 
         # Instance the size of the window
         self.width = 600
@@ -248,48 +252,34 @@ class GUI:
         # Disable the text widget
         self.result_text.config(state=tk.DISABLED)
 
+    def search_behavior(self):
+        """This function will be attached to the search button."""
 
-class CheckButtonState(Enum):
-    """This class will be used to identify the state of the program."""
+        # Get the text of the entries
+        word_1 = self.entry_1.get()
+        word_2 = self.entry_2.get()
 
-    IDLE = 0
-    ASSERTION = 1
-    HYPERNYM = 2
-    ENTAILMENT = 3
-    SIMILARITY = 4
-    MERONYM_HOLONYM = 5
-    CAUSED = 6
-    VERBS_LEXICAL_RELATION = 7
-    ATTRIBUTE = 8
-    ANTONYM = 9
-    SA = 10
-    PARTICIPLE = 11
-    PERTAINS = 12
+        # Get the state of the program
+        state = self.state
 
-    def __str__(self):
-        if self == CheckButtonState.ASSERTION:
-            return "Assertion"
-        elif self == CheckButtonState.HYPERNYM:
-            return "Hypernym"
-        elif self == CheckButtonState.ENTAILMENT:
-            return "Entailment"
-        elif self == CheckButtonState.SIMILARITY:
-            return "Similarity"
-        elif self == CheckButtonState.MERONYM_HOLONYM:
-            return "Meronym/Holonym"
-        elif self == CheckButtonState.CAUSED:
-            return "Caused"
-        elif self == CheckButtonState.VERBS_LEXICAL_RELATION:
-            return "Verbs Lexical Relation"
-        elif self == CheckButtonState.ATTRIBUTE:
-            return "Attribute"
-        elif self == CheckButtonState.ANTONYM:
-            return "Antonym"
-        elif self == CheckButtonState.SA:
-            return "Adicional information"
-        elif self == CheckButtonState.PARTICIPLE:
-            return "Participe"
-        elif self == CheckButtonState.PERTAINS:
-            return "Pertenece"
-        else:
-            return "Unknown"
+        self.consulter.receive_query(state, word_1, word_2)
+        self.consulter.process_query()
+
+        self.show_result(self.consulter.result_string)
+
+    def clear_behavior(self):
+        """This function will be attached to the clear button."""
+
+        # Delete the text of the entries
+        self.entry_1.delete(0, tk.END)
+        self.entry_2.delete(0, tk.END)
+
+        # Set the state of the program to IDLE
+        self.state = CheckButtonState.IDLE
+
+        # Deactivate the check buttons
+        for value in self.check_buttons_state.values():
+            value.set(0)
+
+        # Delete the text of the result text
+        self.show_result("")
