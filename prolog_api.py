@@ -82,6 +82,10 @@ class Consulter:
             else:
                 self.result_string = self.is_meronym()
 
+        # Check for the Caused operator.
+        elif self.operator == CheckButtonState.CAUSED:
+            self.result_string = self.caused()
+
     def assertion(self):
         """Search all possible meanings of the word 1"""
 
@@ -100,6 +104,44 @@ class Consulter:
         result_string = ""
         for i in range(len(self.word_1.synset_id_list)):
             result_string += f"{self.word_1.word}:\n  ({self.word_1.word_type_list[i]}):\n    {self.word_1.gloss_list[i]}\n"
+
+        return result_string
+
+    def caused(self):
+        """Use the cs predicate to search for the cause of the word 1"""
+
+        # Get the principal data of the word 1
+        self.fill_word_info(1)
+
+        if not self.word_1.exist:
+            return self.not_found(self.word_1.word)
+
+        # Get all the cause of the word
+        cause_synset_list = []
+        for synset_id in self.word_1.synset_id_list:
+            cause_result = self.make_consult(f"cs({synset_id}, CauseID)")
+            cause_synset_list.append(cause_result)
+
+        # Get all the words in the synset
+        cause_words_list = []
+        gloss_list = []
+        for cause_synset in cause_synset_list:
+            for cause_word in cause_synset:
+                cause_words_list.append(self.get_all_words(cause_word["CauseID"]))
+                gloss_list.append(
+                    self.make_consult(f"g({cause_word['CauseID']}, Gloss)")[0]["Gloss"]
+                )
+
+        # Create the result string.
+        result_string = f"Cause words of {self.word_1.word}:\n\n"
+        for i in range(len(cause_words_list)):
+            result_string += f"{gloss_list[i]}:\n "
+            for word in cause_words_list[i]:
+                result_string += f"\t{word}"
+            result_string += "\n\n"
+
+        if result_string == f"Cause words of {self.word_1.word}:\n\n":
+            return "No cause words were found."
 
         return result_string
 
