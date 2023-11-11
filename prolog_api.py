@@ -95,6 +95,10 @@ class Consulter:
             else:
                 self.result_string = self.is_attribute()
 
+        # Check for the Adicional information operator.
+        elif self.operator == CheckButtonState.SA:
+            self.result_string = self.sa()
+
     def assertion(self):
         """Search all possible meanings of the word 1"""
 
@@ -151,6 +155,53 @@ class Consulter:
 
         if result_string == f"Cause words of {self.word_1.word}:\n\n":
             return "No cause words were found."
+
+        return result_string
+
+    def sa(self):
+        """Use the sa predicate to search for words that adds adicional information to the word 1."""
+
+        # sa/4 receive the word synset id and word number, and return the synset id and word number of the words that adds adicional information.
+
+        # Get the principal data of the word 1
+        self.fill_word_info(1)
+
+        if not self.word_1.exist:
+            return self.not_found(self.word_1.word)
+
+        # Get all the words that adds adicional information to the word 1.
+        sa_synset_list = []
+        for i in range(len(self.word_1.synset_id_list)):
+            sa_result = self.make_consult(
+                f"sa({self.word_1.synset_id_list[i]}, {self.word_1.word_number_list[i]}, SynsetID, WordNumber)"
+            )
+            sa_synset_list.append(sa_result)
+
+        # Get all the words in the synset
+        sa_words_list = []
+        gloss_list = []
+        for sa_synset in sa_synset_list:
+            for sa_word in sa_synset:
+                sa_words_list.append(self.get_all_words(sa_word["SynsetID"]))
+                gloss_list.append(
+                    self.make_consult(f"g({sa_word['SynsetID']}, Gloss)")[0]["Gloss"]
+                )
+
+        # Create the result string.
+        result_string = (
+            f"Words that adds adicional information to {self.word_1.word}:\n\n"
+        )
+        for i in range(len(sa_words_list)):
+            result_string += f"{gloss_list[i]}:\n "
+            for word in sa_words_list[i]:
+                result_string += f"\t{word}"
+            result_string += "\n\n"
+
+        if (
+            result_string
+            == f"Words that adds adicional information to {self.word_1.word}:\n\n"
+        ):
+            return "No words that adds adicional information were found."
 
         return result_string
 
