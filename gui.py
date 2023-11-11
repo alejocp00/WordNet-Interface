@@ -229,7 +229,7 @@ class GUI:
         elif self.state == CheckButtonState.PARTICIPLE:
             self.entry_info_1.config(text="Adjective")
             self.entry_info_2.config(text="Verb")
-        elif self.state == CheckButtonState.PERTENECE:
+        elif self.state == CheckButtonState.PERTAINS:
             self.entry_info_1.config(text="Adjective or adverb")
             self.entry_info_2.config(text="Adjective if 1st is adverb. Otherwise both.")
 
@@ -264,7 +264,7 @@ class CheckButtonState(Enum):
     ANTONYM = 9
     SA = 10
     PARTICIPLE = 11
-    PERTENECE = 12
+    PERTAINS = 12
 
     def __str__(self):
         if self == CheckButtonState.ASSERTION:
@@ -289,7 +289,7 @@ class CheckButtonState(Enum):
             return "Adicional information"
         elif self == CheckButtonState.PARTICIPLE:
             return "Participe"
-        elif self == CheckButtonState.PERTENECE:
+        elif self == CheckButtonState.PERTAINS:
             return "Pertenece"
         else:
             return "Unknown"
