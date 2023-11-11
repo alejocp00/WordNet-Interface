@@ -86,6 +86,15 @@ class Consulter:
         elif self.operator == CheckButtonState.CAUSED:
             self.result_string = self.caused()
 
+        # Check for the Attribute operator.
+        elif self.operator == CheckButtonState.ATTRIBUTE:
+            if self.word_2.word == "" and self.word_1.word != "":
+                self.result_string = self.attribute_of(1)
+            elif self.word_1.word == "" and self.word_2.word != "":
+                self.result_string = self.attribute_of(2)
+            else:
+                self.result_string = self.is_attribute()
+
     def assertion(self):
         """Search all possible meanings of the word 1"""
 
@@ -568,12 +577,6 @@ class Consulter:
             else "part"
         )
 
-        consult = (
-            f"{operator}({synset_id}, Consult_ID)"
-            if function == "Meronym"
-            else f"{operator}(Consult_ID, {synset_id})"
-        )
-
         # Get all the meronym of the word
         consult_synset_list = []
         for synset_id in self.word_1.synset_id_list:
@@ -610,6 +613,74 @@ class Consulter:
     # Todo: Implement this method.
     def is_meronym(self):
         pass
+
+    # endregion
+
+    # region Attribute
+
+    def attribute_of(self, word_indicator: int = 1):
+        """Search all possible meanings of the word 1 and 2"""
+
+        # Get the principal data of the word 1 and 2
+        self.fill_word_info(word_indicator)
+
+        temp_word = self.word_1 if word_indicator == 1 else self.word_2
+
+        if not temp_word.exist:
+            return self.not_found(temp_word.word)
+
+        # Get all the attribute of the word
+        attribute_synset_list = []
+        for synset_id in temp_word.synset_id_list:
+            attribute_result = self.make_consult(f"at({synset_id}, AttributeID)")
+            attribute_synset_list.append(attribute_result)
+
+        # Get all the words in the synset
+        attribute_words_list = []
+        gloss_list = []
+        for attribute_synset in attribute_synset_list:
+            for attribute_word in attribute_synset:
+                attribute_words_list.append(
+                    self.get_all_words(attribute_word["AttributeID"])
+                )
+                gloss_list.append(
+                    self.make_consult(f"g({attribute_word['AttributeID']}, Gloss)")[0][
+                        "Gloss"
+                    ]
+                )
+
+        # Create the result string.
+        result_string = f"Attribute words of {temp_word.word}:\n\n"
+        for i in range(len(attribute_words_list)):
+            result_string += f"{gloss_list[i]}:\n "
+            for word in attribute_words_list[i]:
+                result_string += f"\t{word}"
+            result_string += "\n\n"
+
+        if result_string == f"Attribute words of {temp_word.word}:\n\n":
+            return "No attribute words were found."
+
+        return result_string
+
+    def is_attribute(self):
+        """Search if the word 2 is attribute of the word 1"""
+
+        # Get the principal data of the word 1 and 2
+        self.fill_word_info(1)
+        self.fill_word_info(2)
+
+        if not self.word_1.exist:
+            return self.not_found(self.word_1.word)
+        if not self.word_2.exist:
+            return self.not_found(self.word_2.word)
+
+        # Call at predicate with the word 1 and 2 for every synset id.
+        for synset_id_1 in self.word_1.synset_id_list:
+            for synset_id_2 in self.word_2.synset_id_list:
+                at_result = self.make_consult(f"at({synset_id_1}, {synset_id_2})")
+                if at_result != []:
+                    return f"{self.word_2.word} is attribute of {self.word_1.word}."
+        return f"{self.word_2.word} is not attribute of {self.word_1.word}"
 
     # endregion
 
