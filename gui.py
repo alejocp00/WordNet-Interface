@@ -48,8 +48,12 @@ class GUI:
         self.create_check_buttons()
 
         # Create the two buttons (Search, Clear)
-        self.button_search = tk.Button(self.entries_frame, text="Search")
-        self.button_clear = tk.Button(self.entries_frame, text="Clear")
+        self.button_search = tk.Button(
+            self.entries_frame, text="Search", command=self.search_behavior
+        )
+        self.button_clear = tk.Button(
+            self.entries_frame, text="Clear", command=self.clear_behavior
+        )
 
         # Create the result text
         self.result_text = tk.Text(self.root)
