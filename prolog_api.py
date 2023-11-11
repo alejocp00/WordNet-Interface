@@ -61,6 +61,15 @@ class Consulter:
             else:
                 self.result_string = self.is_hypernym()
 
+        # Check for the Entailment operator.
+        elif self.operator == CheckButtonState.ENTAILMENT:
+            if self.word_2.word == "" and self.word_1.word != "":
+                self.result_string = self.entailment_of()
+            elif self.word_1.word == "" and self.word_2.word != "":
+                self.result_string = self.inverse_entailment()
+            else:
+                self.result_string = self.is_entailment()
+
     def assertion(self):
         """Search all possible meanings of the word 1"""
 
@@ -349,6 +358,133 @@ class Consulter:
                 return f"{self.word_2.word} is hypernym of {self.word_1.word}.\n\n{gloss_list[i]}:\n\t{self.word_1.word}"
 
         return f"{self.word_2.word} is not hypernym of {self.word_1.word}."
+
+    # endregion
+
+    # region Entailment
+
+    def entailment_of(self):
+        """Search all possible meanings of the word 1"""
+
+        # Get the principal data of the word 1
+        self.fill_word_info(1)
+
+        if not self.word_1.exist:
+            return self.not_found(self.word_1.word)
+
+        # Get all the entailment of the word
+        entailment_synset_list = []
+        for synset_id in self.word_1.synset_id_list:
+            entailment_result = self.make_consult(f"ent({synset_id}, EntailmentID)")
+            entailment_synset_list.append(entailment_result)
+
+        # Get all the words in the synset
+        entailment_words_list = []
+        gloss_list = []
+        for entailment_synset in entailment_synset_list:
+            for entailment_word in entailment_synset:
+                entailment_words_list.append(
+                    self.get_all_words(entailment_word["EntailmentID"])
+                )
+                gloss_list.append(
+                    self.make_consult(f"g({entailment_word['EntailmentID']}, Gloss)")[
+                        0
+                    ]["Gloss"]
+                )
+
+        # Create the result string.
+        result_string = f"Entailment words of {self.word_1.word}:\n\n"
+        for i in range(len(entailment_words_list)):
+            result_string += f"{gloss_list[i]}:\n "
+            for word in entailment_words_list[i]:
+                result_string += f"\t{word}"
+            result_string += "\n\n"
+
+        if result_string == f"Entailment words of {self.word_1.word}:\n\n":
+            return "No entailment words were found."
+
+        return result_string
+
+    def inverse_entailment(self):
+        """Search for all the words that the word 2 is entailment of"""
+
+        # Get the principal data of the word 2
+        self.fill_word_info(2)
+
+        if not self.word_2.exist:
+            return self.not_found(self.word_2.word)
+
+        # Get all the inverse entailment of the word
+        inverse_entailment_synset_list = []
+        for synset_id in self.word_2.synset_id_list:
+            inverse_entailment_result = self.make_consult(f"ent(SynsetID, {synset_id})")
+            inverse_entailment_synset_list.append(inverse_entailment_result)
+
+        # Get all the words in the synset
+        inverse_entailment_words_list = []
+        gloss_list = []
+        for inverse_entailment_synset in inverse_entailment_synset_list:
+            for inverse_entailment_word in inverse_entailment_synset:
+                inverse_entailment_words_list.append(
+                    self.get_all_words(inverse_entailment_word["SynsetID"])
+                )
+                gloss_list.append(
+                    self.make_consult(
+                        f"g({inverse_entailment_word['SynsetID']}, Gloss)"
+                    )[0]["Gloss"]
+                )
+
+        # Create the result string.
+        result_string = f"Inverse entailment words of {self.word_2.word}:\n\n"
+        for i in range(len(inverse_entailment_words_list)):
+            result_string += f"{gloss_list[i]}:\n "
+            for word in inverse_entailment_words_list[i]:
+                result_string += f"\t{word}"
+            result_string += "\n\n"
+
+        if result_string == f"Inverse entailment words of {self.word_2.word}:\n\n":
+            return "No inverse entailment words were found."
+
+        return result_string
+
+    def is_entailment(self):
+        """Search if the word 2 is entailment of the word 1"""
+
+        # Get the principal data of the word 1 and 2
+        self.fill_word_info(1)
+        self.fill_word_info(2)
+
+        if not self.word_1.exist:
+            return self.not_found(self.word_1.word)
+        if not self.word_2.exist:
+            return self.not_found(self.word_2.word)
+
+        # Get all the entailment of the word 1
+        entailment_synset_list = []
+        for synset_id in self.word_1.synset_id_list:
+            entailment_result = self.make_consult(f"ent({synset_id}, EntailmentID)")
+            entailment_synset_list.append(entailment_result)
+
+        # Get all the words in the synset
+        entailment_words_list = []
+        gloss_list = []
+        for entailment_synset in entailment_synset_list:
+            for entailment_word in entailment_synset:
+                entailment_words_list.append(
+                    self.get_all_words(entailment_word["EntailmentID"])
+                )
+                gloss_list.append(
+                    self.make_consult(f"g({entailment_word['EntailmentID']}, Gloss)")[
+                        0
+                    ]["Gloss"]
+                )
+
+        # Check if the word 2 is in the entailment words list
+        for i in range(len(entailment_words_list)):
+            if self.word_2.word in entailment_words_list[i]:
+                return f"{self.word_2.word} is entailment of {self.word_1.word}.\n\n{gloss_list[i]}:\n\t{self.word_1.word}"
+
+        return f"{self.word_2.word} is not entailment of {self.word_1.word}"
 
     # endregion
 
