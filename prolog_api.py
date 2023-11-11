@@ -311,9 +311,44 @@ class Consulter:
 
         return result_string
 
-    # Todo: Implement this method.
     def is_hypernym(self):
-        pass
+        """Search if the word 2 is hypernym of the word 1"""
+
+        # Get the principal data of the word 1 and 2
+        self.fill_word_info(1)
+        self.fill_word_info(2)
+
+        if not self.word_1.exist:
+            return self.not_found(self.word_1.word)
+        if not self.word_2.exist:
+            return self.not_found(self.word_2.word)
+
+        # Get all the hypernym of the word 1
+        hypernym_synset_list = []
+        for synset_id in self.word_1.synset_id_list:
+            hypernym_result = self.make_consult(f"hyp({synset_id}, HypernymID)")
+            hypernym_synset_list.append(hypernym_result)
+
+        # Get all the words in the synset
+        hypernym_words_list = []
+        gloss_list = []
+        for hypernym_synset in hypernym_synset_list:
+            for hypernym_word in hypernym_synset:
+                hypernym_words_list.append(
+                    self.get_all_words(hypernym_word["HypernymID"])
+                )
+                gloss_list.append(
+                    self.make_consult(f"g({hypernym_word['HypernymID']}, Gloss)")[0][
+                        "Gloss"
+                    ]
+                )
+
+        # Check if the word 2 is in the hypernym words list
+        for i in range(len(hypernym_words_list)):
+            if self.word_2.word in hypernym_words_list[i]:
+                return f"{self.word_2.word} is hypernym of {self.word_1.word}.\n\n{gloss_list[i]}:\n\t{self.word_1.word}"
+
+        return f"{self.word_2.word} is not hypernym of {self.word_1.word}."
 
     # endregion
 
