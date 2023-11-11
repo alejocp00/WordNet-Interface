@@ -126,9 +126,43 @@ class Consulter:
 
         return result_string
 
-    # Todo: Implement this method.
     def similarity_1_to_2(self):
-        pass
+        """Search if the two given words are similar"""
+
+        # Fill words info
+        self.fill_word_info(1)
+        self.fill_word_info(2)
+
+        # Check if the words exist
+        if not self.word_1.exist:
+            return self.not_found(self.word_1.word)
+        if not self.word_2.exist:
+            return self.not_found(self.word_2.word)
+
+        # Get all the similar of the word 1
+        similar_synset_list = []
+        for synset_id in self.word_1.synset_id_list:
+            similar_result = self.make_consult(f"sim({synset_id}, SimilarID)")
+            similar_synset_list.append(similar_result)
+
+        # Get all the words in the synset
+        similar_words_list = []
+        gloss_list = []
+        for similar_synset in similar_synset_list:
+            for similar_word in similar_synset:
+                similar_words_list.append(self.get_all_words(similar_word["SimilarID"]))
+                gloss_list.append(
+                    self.make_consult(f"g({similar_word['SimilarID']}, Gloss)")[0][
+                        "Gloss"
+                    ]
+                )
+
+        # Check if the word 2 is in the similar words list
+        for i in range(len(similar_words_list)):
+            if self.word_2.word in similar_words_list[i]:
+                return f"{self.word_1.word} and {self.word_2.word} are similar.\n\n{gloss_list[i]}:\n\t{self.word_2.word}"
+
+        return f"{self.word_1.word} and {self.word_2.word} are not similar."
 
     # endregion
 
