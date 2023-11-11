@@ -99,6 +99,15 @@ class Consulter:
         elif self.operator == CheckButtonState.SA:
             self.result_string = self.sa()
 
+        # Check for the Participle operator.
+        elif self.operator == CheckButtonState.PARTICIPLE:
+            if self.word_2.word == "" and self.word_1.word != "":
+                self.result_string = self.participle_of(1)
+            elif self.word_1.word == "" and self.word_2.word != "":
+                self.result_string = self.participle_of(2)
+            else:
+                self.result_string = self.is_participle()
+
     def assertion(self):
         """Search all possible meanings of the word 1"""
 
@@ -204,6 +213,96 @@ class Consulter:
             return "No words that adds adicional information were found."
 
         return result_string
+
+    # region Participle
+
+    def participle_of(self, word_indicator: int = 1):
+        """Using the ppl/4 predicate, search for the participle of the word 1 and 2.
+
+        Args:
+            word_indicator (int, optional): Selector of the word that will be used. Defaults to 1.
+
+        Returns:
+            _type_: String with the result.
+        """
+
+        # Get the principal data of the word 1 and 2
+        self.fill_word_info(word_indicator)
+
+        temp_word = self.word_1 if word_indicator == 1 else self.word_2
+
+        if not temp_word.exist:
+            return self.not_found(temp_word.word)
+
+        # Get all the participle of the word
+        participle_synset_list = []
+        for i in range(len(temp_word.synset_id_list)):
+            if word_indicator == 1:
+                participle_result = self.make_consult(
+                    f"ppl({temp_word.synset_id_list[i]},{temp_word.word_number_list[i]}, SynsetID, WordNumber)"
+                )
+            else:
+                participle_result = self.make_consult(
+                    f"ppl(SynsetID, WordNumber,{temp_word.synset_id_list[i]},{temp_word.word_number_list[i]})"
+                )
+            participle_synset_list.append(participle_result)
+
+        # Get the words indexing with the word number. This will consult s/6 with the synset id and the word number.
+        participle_words_list = []
+        for participle_synset in participle_synset_list:
+            for participle_word in participle_synset:
+                participle_words_list.append(
+                    self.make_consult(
+                        f"s({participle_word['SynsetID']}, {participle_word['WordNumber']}, Word, _, _, _)"
+                    )[0]["Word"]
+                )
+
+        # Get the gloss of the participle synset.
+        gloss_list = []
+        for participle_synset in participle_synset_list:
+            for participle_word in participle_synset:
+                gloss_list.append(
+                    self.make_consult(f"g({participle_word['SynsetID']}, Gloss)")[0][
+                        "Gloss"
+                    ]
+                )
+
+        # Create the result string.
+        result_string = f"Participle words of {temp_word.word}:\n\n"
+        for i in range(len(participle_words_list)):
+            result_string += f"{gloss_list[i]}:\n "
+            result_string += f"\t{participle_words_list[i]}"
+            result_string += "\n\n"
+
+        if result_string == f"Participle words of {temp_word.word}:\n\n":
+            return "No participle words were found."
+
+        return result_string
+
+    def is_participle(self):
+        """Search if the word 2 is participle of the word 1"""
+
+        # Get the principal data of the word 1 and 2
+        self.fill_word_info(1)
+        self.fill_word_info(2)
+
+        if not self.word_1.exist:
+            return self.not_found(self.word_1.word)
+        if not self.word_2.exist:
+            return self.not_found(self.word_2.word)
+
+        # Call ppl predicate with the word 1 and 2 for every synset id.
+        for synset_id_1 in self.word_1.synset_id_list:
+            for synset_id_2 in self.word_2.synset_id_list:
+                ppl_result = self.make_consult(
+                    f"ppl({synset_id_1}, {synset_id_2}, _, _)"
+                )
+                if ppl_result != []:
+                    return f"{self.word_2.word} is participle of {self.word_1.word}."
+
+        return f"{self.word_2.word} is not participle of {self.word_1.word}"
+
+    # endregion
 
     # region Similarity
 
