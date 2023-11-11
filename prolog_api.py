@@ -1,6 +1,52 @@
+from enum import Enum
 from pyswip import Prolog
-from gui import CheckButtonState
 import os
+
+
+class CheckButtonState(Enum):
+    """This class will be used to identify the state of the program."""
+
+    IDLE = 0
+    ASSERTION = 1
+    HYPERNYM = 2
+    ENTAILMENT = 3
+    SIMILARITY = 4
+    MERONYM_HOLONYM = 5
+    CAUSED = 6
+    VERBS_LEXICAL_RELATION = 7
+    ATTRIBUTE = 8
+    ANTONYM = 9
+    SA = 10
+    PARTICIPLE = 11
+    PERTAINS = 12
+
+    def __str__(self):
+        if self == CheckButtonState.ASSERTION:
+            return "Assertion"
+        elif self == CheckButtonState.HYPERNYM:
+            return "Hypernym"
+        elif self == CheckButtonState.ENTAILMENT:
+            return "Entailment"
+        elif self == CheckButtonState.SIMILARITY:
+            return "Similarity"
+        elif self == CheckButtonState.MERONYM_HOLONYM:
+            return "Meronym/Holonym"
+        elif self == CheckButtonState.CAUSED:
+            return "Caused"
+        elif self == CheckButtonState.VERBS_LEXICAL_RELATION:
+            return "Verbs Lexical Relation"
+        elif self == CheckButtonState.ATTRIBUTE:
+            return "Attribute"
+        elif self == CheckButtonState.ANTONYM:
+            return "Antonym"
+        elif self == CheckButtonState.SA:
+            return "Adicional information"
+        elif self == CheckButtonState.PARTICIPLE:
+            return "Participe"
+        elif self == CheckButtonState.PERTAINS:
+            return "Pertenece"
+        else:
+            return "Unknown"
 
 
 class Consulter:
