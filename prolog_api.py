@@ -108,6 +108,10 @@ class Consulter:
             else:
                 self.result_string = self.is_participle()
 
+        # Check for the Pertains operator.
+        elif self.operator == CheckButtonState.PERTAINS:
+            self.result_string = self.pertains()
+
     def assertion(self):
         """Search all possible meanings of the word 1"""
 
@@ -211,6 +215,46 @@ class Consulter:
             == f"Words that adds adicional information to {self.word_1.word}:\n\n"
         ):
             return "No words that adds adicional information were found."
+
+        return result_string
+
+    def pertains(self):
+        """Using the per/4 predicate, search for the words that word 1 pertains to."""
+
+        # Get the principal data of the word 1
+        self.fill_word_info(1)
+
+        if not self.word_1.exist:
+            return self.not_found(self.word_1.word)
+
+        # Get all the words that adds adicional information to the word 1.
+        per_synset_list = []
+        for i in range(len(self.word_1.synset_id_list)):
+            per_result = self.make_consult(
+                f"per({self.word_1.synset_id_list[i]}, {self.word_1.word_number_list[i]}, SynsetID, WordNumber)"
+            )
+            per_synset_list.append(per_result)
+
+        # Get all the words in the synset
+        per_words_list = []
+        gloss_list = []
+        for per_synset in per_synset_list:
+            for per_word in per_synset:
+                per_words_list.append(self.get_all_words(per_word["SynsetID"]))
+                gloss_list.append(
+                    self.make_consult(f"g({per_word['SynsetID']}, Gloss)")[0]["Gloss"]
+                )
+
+        # Create the result string.
+        result_string = f"Words that {self.word_1.word} pertains to:\n\n"
+        for i in range(len(per_words_list)):
+            result_string += f"{gloss_list[i]}:\n "
+            for word in per_words_list[i]:
+                result_string += f"\t{word}"
+            result_string += "\n\n"
+
+        if result_string == f"Words that {self.word_1.word} pertains to:\n\n":
+            return f"No words that {self.word_1.word} pertains to were found."
 
         return result_string
 
