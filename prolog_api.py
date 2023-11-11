@@ -1,15 +1,59 @@
+from enum import Enum
 from pyswip import Prolog
-from gui import CheckButtonState
 import os
+
+
+class CheckButtonState(Enum):
+    """This class will be used to identify the state of the program."""
+
+    IDLE = 0
+    ASSERTION = 1
+    HYPERNYM = 2
+    ENTAILMENT = 3
+    SIMILARITY = 4
+    MERONYM_HOLONYM = 5
+    CAUSED = 6
+    ATTRIBUTE = 7
+    ANTONYM = 8
+    SA = 9
+    PARTICIPLE = 10
+    PERTAINS = 11
+
+    def __str__(self):
+        if self == CheckButtonState.ASSERTION:
+            return "Assertion"
+        elif self == CheckButtonState.HYPERNYM:
+            return "Hypernym"
+        elif self == CheckButtonState.ENTAILMENT:
+            return "Entailment"
+        elif self == CheckButtonState.SIMILARITY:
+            return "Similarity"
+        elif self == CheckButtonState.MERONYM_HOLONYM:
+            return "Meronym/Holonym"
+        elif self == CheckButtonState.CAUSED:
+            return "Caused"
+        elif self == CheckButtonState.ATTRIBUTE:
+            return "Attribute"
+        elif self == CheckButtonState.ANTONYM:
+            return "Antonym"
+        elif self == CheckButtonState.SA:
+            return "Adicional information"
+        elif self == CheckButtonState.PARTICIPLE:
+            return "Participe"
+        elif self == CheckButtonState.PERTAINS:
+            return "Pertenece"
+        else:
+            return "Unknown"
 
 
 class Consulter:
     def __init__(self):
         # Create the prolog object.
         self.prolog = Prolog()
-
         # Consult the prolog files.
         self.load_consults()
+
+        self.result_string = ""
 
     def load_consults(self):
         """Load every prolog file in prolog_files."""
@@ -27,8 +71,6 @@ class Consulter:
 
     def process_query(self):
         """Perform the operation in the query"""
-
-        self.result_string = "Processing..."
 
         # Check for the Assertion operator.
         if self.operator == CheckButtonState.ASSERTION:
@@ -111,6 +153,9 @@ class Consulter:
         # Check for the Pertains operator.
         elif self.operator == CheckButtonState.PERTAINS:
             self.result_string = self.pertains()
+
+        else:
+            self.result_string = "Please select an operator."
 
     def assertion(self):
         """Search all possible meanings of the word 1"""
