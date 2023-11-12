@@ -73,56 +73,61 @@ class Consulter:
         """Perform the operation in the query"""
 
         # Check for the Assertion operator.
+
+        word_selector = 1 if self.word_1.word != "" else 2
+        both_words = self.word_1.word != "" and self.word_2.word != ""
+
+        # Get info of the word 1 and 2
+        self.fill_word_info(1)
+        self.fill_word_info(2)
+
+        # Check for the Assertion operator.
         if self.operator == CheckButtonState.ASSERTION:
             self.result_string = self.assertion()
 
         # Check for the Similarity operator.
         elif self.operator == CheckButtonState.SIMILARITY:
-            if self.word_2.word == "" and self.word_1.word != "":
-                self.result_string = self.similarity_1_to_all(1)
-            elif self.word_1.word == "" and self.word_2.word != "":
-                self.result_string = self.similarity_1_to_all(2)
-            else:
+            if both_words:
                 self.result_string = self.similarity_1_to_2()
+            else:
+                self.result_string = self.similarity_1_to_all(word_selector)
 
         # Check for the Antonym operator.
         elif self.operator == CheckButtonState.ANTONYM:
-            if self.word_2.word == "" and self.word_1.word != "":
-                self.result_string = self.antonym_1_to_all(1)
-            elif self.word_1.word == "" and self.word_2.word != "":
-                self.result_string = self.antonym_1_to_all(2)
-            else:
+            if both_words:
                 self.result_string = self.antonym_1_to_2()
+            else:
+                self.result_string = self.antonym_1_to_all(word_selector)
 
         # Check for the Hypernym operator.
         elif self.operator == CheckButtonState.HYPERNYM:
-            if self.word_2.word == "" and self.word_1.word != "":
-                self.result_string = self.hypernym_of()
-            elif self.word_1.word == "" and self.word_2.word != "":
-                self.result_string = self.inverse_hypernym()
-            else:
+            if both_words:
                 self.result_string = self.is_hypernym()
+            elif word_selector == 1:
+                self.result_string = self.hypernym_of()
+            else:
+                self.result_string = self.inverse_hypernym()
 
         # Check for the Entailment operator.
         elif self.operator == CheckButtonState.ENTAILMENT:
-            if self.word_2.word == "" and self.word_1.word != "":
-                self.result_string = self.entailment_of()
-            elif self.word_1.word == "" and self.word_2.word != "":
-                self.result_string = self.inverse_entailment()
-            else:
+            if both_words:
                 self.result_string = self.is_entailment()
+            elif word_selector == 1:
+                self.result_string = self.entailment_of()
+            else:
+                self.result_string = self.inverse_entailment()
 
         # Check for meronym holonym
         elif self.operator == CheckButtonState.MERONYM_HOLONYM:
             operations = ["mm", "ms", "mp"]
-            if self.word_2.word == "" and self.word_1.word != "":
+            if both_words:
+                self.result_string = self.is_meronym_holonym()
+            elif word_selector == 1:
                 for operation in operations:
                     self.result_string += self.mer_hol("Meronym", operation)
-            elif self.word_1.word == "" and self.word_2.word != "":
+            else:
                 for operation in operations:
                     self.result_string += self.mer_hol("Holonym", operation)
-            else:
-                self.result_string = self.is_meronym()
 
         # Check for the Caused operator.
         elif self.operator == CheckButtonState.CAUSED:
@@ -130,12 +135,10 @@ class Consulter:
 
         # Check for the Attribute operator.
         elif self.operator == CheckButtonState.ATTRIBUTE:
-            if self.word_2.word == "" and self.word_1.word != "":
-                self.result_string = self.attribute_of(1)
-            elif self.word_1.word == "" and self.word_2.word != "":
-                self.result_string = self.attribute_of(2)
-            else:
+            if both_words:
                 self.result_string = self.is_attribute()
+            else:
+                self.result_string = self.attribute_of(word_selector)
 
         # Check for the Adicional information operator.
         elif self.operator == CheckButtonState.SA:
@@ -143,12 +146,10 @@ class Consulter:
 
         # Check for the Participle operator.
         elif self.operator == CheckButtonState.PARTICIPLE:
-            if self.word_2.word == "" and self.word_1.word != "":
-                self.result_string = self.participle_of(1)
-            elif self.word_1.word == "" and self.word_2.word != "":
-                self.result_string = self.participle_of(2)
-            else:
+            if both_words:
                 self.result_string = self.is_participle()
+            else:
+                self.result_string = self.participle_of(word_selector)
 
         # Check for the Pertains operator.
         elif self.operator == CheckButtonState.PERTAINS:
@@ -159,9 +160,6 @@ class Consulter:
 
     def assertion(self):
         """Search all possible meanings of the word 1"""
-
-        # Get the principal data of the word 1
-        self.fill_word_info(1)
 
         if not self.word_1.exist:
             return self.not_found(self.word_1.word)
@@ -180,9 +178,6 @@ class Consulter:
 
     def caused(self):
         """Use the cs predicate to search for the cause of the word 1"""
-
-        # Get the principal data of the word 1
-        self.fill_word_info(1)
 
         if not self.word_1.exist:
             return self.not_found(self.word_1.word)
@@ -204,14 +199,15 @@ class Consulter:
                 )
 
         # Create the result string.
-        result_string = f"Cause words of {self.word_1.word}:\n\n"
+        start_string = f"Cause words of {self.word_1.word}:\n\n"
+        result_string = start_string
         for i in range(len(cause_words_list)):
             result_string += f"{gloss_list[i]}:\n "
             for word in cause_words_list[i]:
                 result_string += f"\t{word}"
             result_string += "\n\n"
 
-        if result_string == f"Cause words of {self.word_1.word}:\n\n":
+        if result_string == start_string:
             return "No cause words were found."
 
         return result_string
@@ -220,9 +216,6 @@ class Consulter:
         """Use the sa predicate to search for words that adds adicional information to the word 1."""
 
         # sa/4 receive the word synset id and word number, and return the synset id and word number of the words that adds adicional information.
-
-        # Get the principal data of the word 1
-        self.fill_word_info(1)
 
         if not self.word_1.exist:
             return self.not_found(self.word_1.word)
@@ -246,28 +239,23 @@ class Consulter:
                 )
 
         # Create the result string.
-        result_string = (
+        start_string = (
             f"Words that adds adicional information to {self.word_1.word}:\n\n"
         )
+        result_string = start_string
         for i in range(len(sa_words_list)):
             result_string += f"{gloss_list[i]}:\n "
             for word in sa_words_list[i]:
                 result_string += f"\t{word}"
             result_string += "\n\n"
 
-        if (
-            result_string
-            == f"Words that adds adicional information to {self.word_1.word}:\n\n"
-        ):
+        if result_string == start_string:
             return "No words that adds adicional information were found."
 
         return result_string
 
     def pertains(self):
         """Using the per/4 predicate, search for the words that word 1 pertains to."""
-
-        # Get the principal data of the word 1
-        self.fill_word_info(1)
 
         if not self.word_1.exist:
             return self.not_found(self.word_1.word)
@@ -314,9 +302,6 @@ class Consulter:
         Returns:
             _type_: String with the result.
         """
-
-        # Get the principal data of the word 1 and 2
-        self.fill_word_info(word_indicator)
 
         temp_word = self.word_1 if word_indicator == 1 else self.word_2
 
@@ -371,10 +356,6 @@ class Consulter:
     def is_participle(self):
         """Search if the word 2 is participle of the word 1"""
 
-        # Get the principal data of the word 1 and 2
-        self.fill_word_info(1)
-        self.fill_word_info(2)
-
         if not self.word_1.exist:
             return self.not_found(self.word_1.word)
         if not self.word_2.exist:
@@ -398,7 +379,6 @@ class Consulter:
     def similarity_1_to_all(self, word_indicator: int = 1):
         """Search all possible meanings of the word 1 and 2"""
 
-        # Get the principal data of the word 1 and 2
         self.fill_word_info(word_indicator)
 
         temp_word = self.word_1 if word_indicator == 1 else self.word_2
@@ -432,7 +412,7 @@ class Consulter:
                 result_string += f"\t{word}"
             result_string += "\n\n"
 
-        if result_string == "":
+        if result_string == f"Similar words with {temp_word.word}:\n\n":
             return "No similar words were found."
 
         return result_string
@@ -441,8 +421,6 @@ class Consulter:
         """Search if the two given words are similar"""
 
         # Fill words info
-        self.fill_word_info(1)
-        self.fill_word_info(2)
 
         # Check if the words exist
         if not self.word_1.exist:
@@ -482,7 +460,6 @@ class Consulter:
     def antonym_1_to_all(self, word_indicator: int = 1):
         """Search all possible meanings of the word 1 and 2"""
 
-        # Get the principal data of the word 1 and 2
         self.fill_word_info(word_indicator)
 
         temp_word = self.word_1 if word_indicator == 1 else self.word_2
@@ -525,7 +502,7 @@ class Consulter:
             result_string += f"\t{antonym_words_list[i]}"
             result_string += "\n\n"
 
-        if result_string == "":
+        if result_string == f"Antonym words with {temp_word.word}:\n\n":
             return "No antonym words were found."
 
         return result_string
@@ -534,8 +511,6 @@ class Consulter:
         """Check if word 2 is antonym of word 1"""
 
         # Fill words info
-        self.fill_word_info(1)
-        self.fill_word_info(2)
 
         # Check if the words exist
         if not self.word_1.exist:
@@ -574,9 +549,6 @@ class Consulter:
 
     def hypernym_of(self):
         """Search all possible meanings of the word 1"""
-
-        # Get the principal data of the word 1
-        self.fill_word_info(1)
 
         if not self.word_1.exist:
             return self.not_found(self.word_1.word)
@@ -617,9 +589,6 @@ class Consulter:
     def inverse_hypernym(self):
         """Search for all the words that the word 2 is hypernym of"""
 
-        # Get the principal data of the word 2
-        self.fill_word_info(2)
-
         if not self.word_2.exist:
             return self.not_found(self.word_2.word)
 
@@ -658,10 +627,6 @@ class Consulter:
 
     def is_hypernym(self):
         """Search if the word 2 is hypernym of the word 1"""
-
-        # Get the principal data of the word 1 and 2
-        self.fill_word_info(1)
-        self.fill_word_info(2)
 
         if not self.word_1.exist:
             return self.not_found(self.word_1.word)
@@ -702,9 +667,6 @@ class Consulter:
     def entailment_of(self):
         """Search all possible meanings of the word 1"""
 
-        # Get the principal data of the word 1
-        self.fill_word_info(1)
-
         if not self.word_1.exist:
             return self.not_found(self.word_1.word)
 
@@ -744,9 +706,6 @@ class Consulter:
     def inverse_entailment(self):
         """Search for all the words that the word 2 is entailment of"""
 
-        # Get the principal data of the word 2
-        self.fill_word_info(2)
-
         if not self.word_2.exist:
             return self.not_found(self.word_2.word)
 
@@ -785,10 +744,6 @@ class Consulter:
 
     def is_entailment(self):
         """Search if the word 2 is entailment of the word 1"""
-
-        # Get the principal data of the word 1 and 2
-        self.fill_word_info(1)
-        self.fill_word_info(2)
 
         if not self.word_1.exist:
             return self.not_found(self.word_1.word)
@@ -830,15 +785,9 @@ class Consulter:
         """Make the consult to the prolog file with the operator. The operator can be mm, ms or mp."""
 
         if function == "Meronym":
-            # Get the principal data of the word 1
-            self.fill_word_info(1)
-
             if not self.word_1.exist:
                 return self.not_found(self.word_1.word)
         elif function == "Holonym":
-            # Get the principal data of the word 2
-            self.fill_word_info(2)
-
             if not self.word_2.exist:
                 return self.not_found(self.word_2.word)
 
@@ -886,10 +835,6 @@ class Consulter:
     def is_meronym(self):
         """Check if the word 2 is meronym of the word 1"""
 
-        # Get the principal data of the word 1 and 2
-        self.fill_word_info(1)
-        self.fill_word_info(2)
-
         if not self.word_1.exist:
             return self.not_found(self.word_1.word)
         if not self.word_2.exist:
@@ -927,7 +872,6 @@ class Consulter:
     def attribute_of(self, word_indicator: int = 1):
         """Search all possible meanings of the word 1 and 2"""
 
-        # Get the principal data of the word 1 and 2
         self.fill_word_info(word_indicator)
 
         temp_word = self.word_1 if word_indicator == 1 else self.word_2
@@ -970,10 +914,6 @@ class Consulter:
 
     def is_attribute(self):
         """Search if the word 2 is attribute of the word 1"""
-
-        # Get the principal data of the word 1 and 2
-        self.fill_word_info(1)
-        self.fill_word_info(2)
 
         if not self.word_1.exist:
             return self.not_found(self.word_1.word)
