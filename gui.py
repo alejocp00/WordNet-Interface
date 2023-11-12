@@ -28,7 +28,7 @@ class GUI:
         self.root = tk.Tk()
         self.root.title("WordNet")
         self.root.geometry(f"{self.width}x{self.height}")
-        self.root.resizable(0, 0)
+        self.root.state("zoomed")
 
         # Create the entries frame
         self.entries_frame = tk.Frame(self.root)
@@ -61,6 +61,9 @@ class GUI:
 
         # Update the state of the program
         self.place()
+
+        # Bind the resize event
+        self.root.bind("<Configure>", self.resize_result_text)
 
     def run(self):
         self.root.mainloop()
@@ -156,6 +159,27 @@ class GUI:
             y=0,
             width=self.width / 2,
             height=self.height,
+        )
+
+    # Resize the result text
+    def resize_result_text(self, event):
+        """This function will resize the result text when the window is resized."""
+
+        # Delay the resize event 1s
+        self.root.after(500, self.resize_result_text_aux)
+
+    def resize_result_text_aux(self):
+        """This function will resize the result text when the window is resized."""
+
+        # Get the new size of the window
+        width = self.root.winfo_width()
+        height = self.root.winfo_height()
+        # Resize the result text
+        self.result_text.place(
+            x=self.width / 2,
+            y=0,
+            width=width,
+            height=height,
         )
 
     def create_check_buttons(self):
