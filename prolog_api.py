@@ -3,7 +3,7 @@ from pyswip import Prolog
 import os
 
 
-class CheckButtonState(Enum):
+class Operator(Enum):
     """This class will be used to identify the state of the program."""
 
     IDLE = 0
@@ -20,28 +20,28 @@ class CheckButtonState(Enum):
     PERTAINS = 11
 
     def __str__(self):
-        if self == CheckButtonState.ASSERTION:
+        if self == Operator.ASSERTION:
             return "Assertion"
-        elif self == CheckButtonState.HYPERNYM:
+        elif self == Operator.HYPERNYM:
             return "Hypernym"
-        elif self == CheckButtonState.ENTAILMENT:
+        elif self == Operator.ENTAILMENT:
             return "Entailment"
-        elif self == CheckButtonState.SIMILARITY:
+        elif self == Operator.SIMILARITY:
             return "Similarity"
-        elif self == CheckButtonState.MERONYM_HOLONYM:
+        elif self == Operator.MERONYM_HOLONYM:
             return "Meronym/Holonym"
-        elif self == CheckButtonState.CAUSED:
+        elif self == Operator.CAUSED:
             return "Caused"
-        elif self == CheckButtonState.ATTRIBUTE:
+        elif self == Operator.ATTRIBUTE:
             return "Attribute"
-        elif self == CheckButtonState.ANTONYM:
+        elif self == Operator.ANTONYM:
             return "Antonym"
-        elif self == CheckButtonState.SA:
+        elif self == Operator.SA:
             return "Adicional information"
-        elif self == CheckButtonState.PARTICIPLE:
-            return "Participe"
-        elif self == CheckButtonState.PERTAINS:
-            return "Pertenece"
+        elif self == Operator.PARTICIPLE:
+            return "Participle"
+        elif self == Operator.PERTAINS:
+            return "Pertains"
         else:
             return "Unknown"
 
@@ -62,7 +62,7 @@ class Consulter:
             if file.endswith(".pl"):
                 self.prolog.consult("prolog_files/" + file)
 
-    def receive_query(self, operator: CheckButtonState, word_1: str, word_2: str):
+    def receive_query(self, operator: Operator, word_1: str, word_2: str):
         """Receive two words and the operator to apply, and set the query"""
 
         self.operator = operator
@@ -82,25 +82,25 @@ class Consulter:
         self.fill_word_info(2)
 
         # Check for the Assertion operator.
-        if self.operator == CheckButtonState.ASSERTION:
+        if self.operator == Operator.ASSERTION:
             self.result_string = self.assertion()
 
         # Check for the Similarity operator.
-        elif self.operator == CheckButtonState.SIMILARITY:
+        elif self.operator == Operator.SIMILARITY:
             if both_words:
                 self.result_string = self.similarity_1_to_2()
             else:
                 self.result_string = self.similarity_1_to_all(word_selector)
 
         # Check for the Antonym operator.
-        elif self.operator == CheckButtonState.ANTONYM:
+        elif self.operator == Operator.ANTONYM:
             if both_words:
                 self.result_string = self.antonym_1_to_2()
             else:
                 self.result_string = self.antonym_1_to_all(word_selector)
 
         # Check for the Hypernym operator.
-        elif self.operator == CheckButtonState.HYPERNYM:
+        elif self.operator == Operator.HYPERNYM:
             if both_words:
                 self.result_string = self.is_hypernym()
             elif word_selector == 1:
@@ -109,7 +109,7 @@ class Consulter:
                 self.result_string = self.inverse_hypernym()
 
         # Check for the Entailment operator.
-        elif self.operator == CheckButtonState.ENTAILMENT:
+        elif self.operator == Operator.ENTAILMENT:
             if both_words:
                 self.result_string = self.is_entailment()
             elif word_selector == 1:
@@ -118,7 +118,7 @@ class Consulter:
                 self.result_string = self.inverse_entailment()
 
         # Check for meronym holonym
-        elif self.operator == CheckButtonState.MERONYM_HOLONYM:
+        elif self.operator == Operator.MERONYM_HOLONYM:
             operations = ["mm", "ms", "mp"]
             if both_words:
                 self.result_string = self.is_meronym_holonym()
@@ -130,29 +130,29 @@ class Consulter:
                     self.result_string += self.mer_hol("Holonym", operation)
 
         # Check for the Caused operator.
-        elif self.operator == CheckButtonState.CAUSED:
+        elif self.operator == Operator.CAUSED:
             self.result_string = self.caused()
 
         # Check for the Attribute operator.
-        elif self.operator == CheckButtonState.ATTRIBUTE:
+        elif self.operator == Operator.ATTRIBUTE:
             if both_words:
                 self.result_string = self.is_attribute()
             else:
                 self.result_string = self.attribute_of(word_selector)
 
         # Check for the Adicional information operator.
-        elif self.operator == CheckButtonState.SA:
+        elif self.operator == Operator.SA:
             self.result_string = self.sa()
 
         # Check for the Participle operator.
-        elif self.operator == CheckButtonState.PARTICIPLE:
+        elif self.operator == Operator.PARTICIPLE:
             if both_words:
                 self.result_string = self.is_participle()
             else:
                 self.result_string = self.participle_of(word_selector)
 
         # Check for the Pertains operator.
-        elif self.operator == CheckButtonState.PERTAINS:
+        elif self.operator == Operator.PERTAINS:
             self.result_string = self.pertains()
 
         else:

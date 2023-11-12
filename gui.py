@@ -1,12 +1,12 @@
 from enum import Enum
 import tkinter as tk
-from prolog_api import Consulter, CheckButtonState
+from prolog_api import Consulter, Operator
 
 
 class GUI:
     def __init__(self):
         # Instance the state of the program
-        self.state = CheckButtonState.IDLE
+        self.state = Operator.IDLE
 
         # Create the buttons dictionaries
         self.check_buttons_dic = {}
@@ -147,7 +147,7 @@ class GUI:
 
         # Placing the check buttons.
         for i in range(11):
-            self.check_buttons_dic[CheckButtonState(i + 1)].grid(
+            self.check_buttons_dic[Operator(i + 1)].grid(
                 row=i // 2,
                 column=i % 2,
                 sticky="w",
@@ -185,7 +185,7 @@ class GUI:
     def create_check_buttons(self):
         """Create the twelve check buttons (Assertion, Hypernym,Entailment,Similarity,Meronym/Holonym,Semantic Relation,Verbs Lexical Relation, Attribute, Antonym, SA, Participe, Pertenece)"""
         for i in range(11):
-            c_enum = CheckButtonState(i + 1)
+            c_enum = Operator(i + 1)
             self.check_buttons_dic[c_enum] = tk.Checkbutton(
                 self.check_buttons_frame,
                 text=c_enum,
@@ -196,7 +196,7 @@ class GUI:
     def poblate_check_buttons_state(self):
         """This function will poblate the check buttons dictionary with the state of the program."""
         for i in range(11):
-            self.check_buttons_state[CheckButtonState(i + 1)] = tk.IntVar()
+            self.check_buttons_state[Operator(i + 1)] = tk.IntVar()
 
     def check_box_behavior(self, selected):
         """This will be the behavior of the check buttons."""
@@ -207,7 +207,7 @@ class GUI:
         # Set state to IDLE if no check button is selected
         for value in self.check_buttons_state.values():
             if value.get() == 0:
-                self.state = CheckButtonState.IDLE
+                self.state = Operator.IDLE
             else:
                 # Update the state of the program
                 self.state = selected
@@ -225,40 +225,40 @@ class GUI:
 
     def select_text(self):
         """This function will select the text of the two entries info text."""
-        if self.state == CheckButtonState.IDLE:
+        if self.state == Operator.IDLE:
             self.entry_info_1.config(text="Word 1")
             self.entry_info_2.config(text="Word 2")
-        elif self.state == CheckButtonState.ASSERTION:
+        elif self.state == Operator.ASSERTION:
             self.entry_info_1.config(text="All kind of words.")
             self.entry_info_2.config(text="Not be used")
-        elif self.state == CheckButtonState.HYPERNYM:
+        elif self.state == Operator.HYPERNYM:
             self.entry_info_1.config(text="Noun or verb")
             self.entry_info_2.config(text="Noun or verb")
-        elif self.state == CheckButtonState.ENTAILMENT:
+        elif self.state == Operator.ENTAILMENT:
             self.entry_info_1.config(text="Verb")
             self.entry_info_2.config(text="Verb")
-        elif self.state == CheckButtonState.SIMILARITY:
+        elif self.state == Operator.SIMILARITY:
             self.entry_info_1.config(text="All kind of words.")
             self.entry_info_2.config(text="All kind of words.")
-        elif self.state == CheckButtonState.MERONYM_HOLONYM:
+        elif self.state == Operator.MERONYM_HOLONYM:
             self.entry_info_1.config(text="Noun")
             self.entry_info_2.config(text="Noun")
-        elif self.state == CheckButtonState.CAUSED:
+        elif self.state == Operator.CAUSED:
             self.entry_info_1.config(text="Verb")
             self.entry_info_2.config(text="Verb")
-        elif self.state == CheckButtonState.ATTRIBUTE:
+        elif self.state == Operator.ATTRIBUTE:
             self.entry_info_1.config(text="Noun")
             self.entry_info_2.config(text="Adjective")
-        elif self.state == CheckButtonState.ANTONYM:
+        elif self.state == Operator.ANTONYM:
             self.entry_info_1.config(text="All kind of words.")
             self.entry_info_2.config(text="All kind of words.")
-        elif self.state == CheckButtonState.SA:
+        elif self.state == Operator.SA:
             self.entry_info_1.config(text="Verb")
             self.entry_info_2.config(text="Verb or adjective")
-        elif self.state == CheckButtonState.PARTICIPLE:
+        elif self.state == Operator.PARTICIPLE:
             self.entry_info_1.config(text="Adjective")
             self.entry_info_2.config(text="Verb")
-        elif self.state == CheckButtonState.PERTAINS:
+        elif self.state == Operator.PERTAINS:
             self.entry_info_1.config(text="Adjective or adverb")
             self.entry_info_2.config(text="Adjective if 1st is adverb. Otherwise both.")
 
@@ -300,7 +300,7 @@ class GUI:
         self.entry_2.delete(0, tk.END)
 
         # Set the state of the program to IDLE
-        self.state = CheckButtonState.IDLE
+        self.state = Operator.IDLE
 
         # Deactivate the check buttons
         for value in self.check_buttons_state.values():
